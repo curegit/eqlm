@@ -84,7 +84,7 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
             raise ValueError()
 
 
-def color_transforms(mode, *, transpose=False):
+def color_transforms(mode, *, gamma=2.2, transpose=False):
     f, r = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
     def g(x):
         y = cv2.cvtColor(x, f)
