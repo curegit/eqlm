@@ -21,9 +21,26 @@ from .types import fileinput, choice
 
 import cv2
 
-modes = {
-    "lightness": "hsl"
-}
+from enum import Enum
+
+
+class Color(Enum):
+    HSV = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
+    HLS = cv2.COLOR_BGR2HLS, cv2.COLOR_HLS2BGR
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True, kw_only=True)
+class ColorOp:
+    color: Color
+    channel: int
+
+class Mode(Enum):
+    Lightness = ColorOp(color=Color.HLS, channel=1)
+    Brightness = ColorOp(color=Color.HSV, channel=2)
+    Saturation = ColorOp(color=Color.HSV, channel=1)
+
+modes = {m.name.lower(): m for m in Mode}
 
 def load_image(filelike, *, normalize: bool = True):
     match filelike:
@@ -84,8 +101,8 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
             raise ValueError()
 
 
-def color_transforms(mode, *, gamma=2.2, transpose=False):
-    f, r = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
+def color_transforms(color: Color, *, gamma=2.2, transpose=False):
+    f, r = color.value
     def g(x):
         y = cv2.cvtColor(x, f)
         return y.transpose(2, 0, 1) if transpose else y
@@ -136,6 +153,7 @@ def main():
     parser = ArgumentParser(prog="eqbr", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Halftone Converter: an image converter to generate halftone images")
     parser.add_argument("input", metavar="FILE", type=fileinput, help="describe input image files (pass '-' to specify stdin)")
     parser.add_argument("output", metavar="FILE", type=fileinput, nargs="?", help="describe input image files (pass '-' to specify stdin)")
+    parser.add_argument("-m", "--mode", choices=list(modes.keys()), help="")
     parser.add_argument("-v", "--version", action="version", version="1")
     parser.add_argument("-F", "--resample", type=choice, choices=["nearest", "linear", "lanczos2", "lanczos3", "spline36"], default="linear", help="resampling method for determining dot size")
     args = parser.parse_args()
@@ -147,13 +165,14 @@ def main():
 
     x = load_image(f)
     bgr, alpha = split_alpha(x)
-    f, g = color_transforms("", transpose=True)
+    mode = modes[args.mode]
+    f, g = color_transforms(mode.value.color, transpose=True)
     a = f(bgr)
     print("Input:", a.shape)
-    h = bi_pp(a, channel=2, n=(m, n), alpha=alpha)
+    h = bi_pp(a, channel=mode.value.channel, n=(m, n), alpha=alpha)
     y = g(h)
     y = merge_alpha(y, alpha)
-    save_image(y, sys.argv[2])
+    save_image(y, args.output)
 
 
 def bi_pp(x, channel:int=0, n:tuple[int | None, int | None]=(2, 2), *, alpha=None):
