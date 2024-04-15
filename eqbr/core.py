@@ -27,6 +27,7 @@ from enum import Enum
 class Color(Enum):
     HSV = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
     HLS = cv2.COLOR_BGR2HLS, cv2.COLOR_HLS2BGR
+    LAB = cv2.COLOR_BGR2Lab, cv2.COLOR_Lab2BGR
 
 from dataclasses import dataclass
 
@@ -36,9 +37,10 @@ class ColorOp:
     channel: int
 
 class Mode(Enum):
-    Lightness = ColorOp(color=Color.HLS, channel=1)
     Brightness = ColorOp(color=Color.HSV, channel=2)
     Saturation = ColorOp(color=Color.HSV, channel=1)
+    Lightness = ColorOp(color=Color.HLS, channel=1)
+    Luminance = ColorOp(color=Color.LAB, channel=0)
 
 modes = {m.name.lower(): m for m in Mode}
 
@@ -101,13 +103,14 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
             raise ValueError()
 
 
-def color_transforms(color: Color, *, gamma=2.2, transpose=False):
+def color_transforms(color: Color, *, gamma:float|None=2.2, transpose=False):
     f, r = color.value
     def g(x):
-        y = cv2.cvtColor(x, f)
+        y = cv2.cvtColor(x if gamma is None else x ** gamma, f)
         return y.transpose(2, 0, 1) if transpose else y
     def h(x):
-        return cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r)
+        z = cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r)
+        return z if gamma is None else z ** (1 / gamma)
     return g, h
 
 def clamp(a, x, b):
