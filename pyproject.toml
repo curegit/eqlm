@@ -1,0 +1,39 @@
+[project]
+name = "eqbr"
+description = "Simple CLI tool to spatially equalize image brightness"
+keywords = ["image processing", "brightness", "saturation", "lightness", "luminance"]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "AGPL-3.0"}
+maintainers = [
+  {name = "curegit", email = "contact@curegit.jp"}
+]
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Multimedia :: Graphics",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+]
+dynamic = ["version"]
+dependencies = [
+  "numpy >= 1.26.0",
+  "opencv-python-headless >= 4.9.0",
+  "pillow >= 9.3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pip", "setuptools", "build", "twine", "black", "mypy"]
+
+[project.urls]
+homepage = "https://github.com/curegit/eqbr"
+repository = "https://github.com/curegit/eqbr.git"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["eqbr"]
+
+[tool.setuptools.dynamic]
+version = {attr = "eqbr.__version__"}
