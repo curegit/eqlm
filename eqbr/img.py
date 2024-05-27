@@ -6,7 +6,7 @@ from io import BufferedIOBase
 from numpy import ndarray
 
 
-def load_image(filelike, *, normalize: bool = True):
+def load_image(filelike, *, normalize: bool = True) -> ndarray:
     match filelike:
         case str() | Path() as path:
             with open(Path(path).resolve(strict=True), "rb") as fp:
@@ -72,21 +72,21 @@ class Color(Enum):
     LAB = cv2.COLOR_BGR2Lab, cv2.COLOR_Lab2BGR
 
 
-def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose=False):
+def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool = False):
     f, r = color.value
 
-    def g(x):
+    def g(x: ndarray) -> ndarray:
         y = cv2.cvtColor(x if gamma is None else x**gamma, f)
         return y.transpose(2, 0, 1) if transpose else y
 
-    def h(x):
+    def h(x: ndarray) -> ndarray:
         z = cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r)
         return z if gamma is None else z ** (1 / gamma)
 
     return g, h
 
 
-def split_alpha(x):
+def split_alpha(x: ndarray) -> tuple[ndarray, ndarray | None]:
     if x.shape[2] == 4:
         return x[:, :, :3], x[:, :, 3]
     elif x.shape[2] == 3:
@@ -94,7 +94,7 @@ def split_alpha(x):
     raise ValueError()
 
 
-def merge_alpha(x, a=None):
+def merge_alpha(x: ndarray, a: ndarray | None = None) -> ndarray:
     if a is None:
         return x
     return np.concatenate((x, a[:, :, np.newaxis]), axis=2)

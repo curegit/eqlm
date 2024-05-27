@@ -3,6 +3,13 @@ from os.path import basename
 from math import isfinite
 
 
+def uint(string):
+    value = int(string)
+    if value >= 0:
+        return value
+    raise ValueError()
+
+
 # 正の実数を受け入れる変換関数
 def positive(str):
     value = float(str)
