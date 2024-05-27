@@ -2,6 +2,7 @@ from sys import float_info
 from os.path import basename
 from math import isfinite
 
+
 # 正の実数を受け入れる変換関数
 def positive(str):
     value = float(str)

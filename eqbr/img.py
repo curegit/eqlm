@@ -1,17 +1,9 @@
-
-
-from io import BufferedIOBase
-
-import numpy as np
-
-from numpy import ndarray
-
-from pathlib import Path
-
 import cv2
-
+import numpy as np
+from pathlib import Path
 from enum import Enum
-
+from io import BufferedIOBase
+from numpy import ndarray
 
 
 def load_image(filelike, *, normalize: bool = True):
@@ -25,8 +17,8 @@ def load_image(filelike, *, normalize: bool = True):
             raise ValueError()
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
-    #flags = cv2.IMREAD_COLOR | cv2.IMREAD_ANYDEPTH
-    #if not orient:
+    # flags = cv2.IMREAD_COLOR | cv2.IMREAD_ANYDEPTH
+    # if not orient:
     #    flags |= cv2.IMREAD_IGNORE_ORIENTATION
     img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED)
     match img.dtype:
@@ -44,6 +36,7 @@ def load_image(filelike, *, normalize: bool = True):
             return img
         case _:
             raise RuntimeError()
+
 
 def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False) -> None:
     match img.dtype:
@@ -79,15 +72,19 @@ class Color(Enum):
     LAB = cv2.COLOR_BGR2Lab, cv2.COLOR_Lab2BGR
 
 
-def color_transforms(color: Color, *, gamma:float|None=2.2, transpose=False):
+def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose=False):
     f, r = color.value
+
     def g(x):
-        y = cv2.cvtColor(x if gamma is None else x ** gamma, f)
+        y = cv2.cvtColor(x if gamma is None else x**gamma, f)
         return y.transpose(2, 0, 1) if transpose else y
+
     def h(x):
         z = cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r)
         return z if gamma is None else z ** (1 / gamma)
+
     return g, h
+
 
 def split_alpha(x):
     if x.shape[2] == 4:
@@ -95,6 +92,7 @@ def split_alpha(x):
     elif x.shape[2] == 3:
         return x, None
     raise ValueError()
+
 
 def merge_alpha(x, a=None):
     if a is None:

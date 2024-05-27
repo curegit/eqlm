@@ -17,8 +17,8 @@ def main():
 
     f = args.input
     o = args.output
-    n = 3 # w
-    m = 2 # h
+    n = 3  # w
+    m = 2  # h
 
     x = load_image(f)
     bgr, alpha = split_alpha(x)

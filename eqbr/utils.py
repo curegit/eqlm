@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def clamp(a, x, b):
     return min(max(x, a), b)
 
