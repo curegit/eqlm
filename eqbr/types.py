@@ -44,14 +44,6 @@ def fileinput(str):
     return nonempty(str)
 
 
-# ファイル名の一部を受け入れる変換関数
-def filenameseg(str):
-    if str == basename(str):
-        return str
-    else:
-        raise ValueError()
-
-
 # 大小文字を区別しないラベルマッチのための変換関数
 def choice(label):
     return str.lower(label)

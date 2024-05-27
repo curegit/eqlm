@@ -1,25 +1,18 @@
 import numpy as np
-
-
-def clamp(a, x, b):
-    return min(max(x, a), b)
+from numpy import ndarray
 
 
 def lerp(a, b, t):
     return a + t * (b - a)
 
 
-def ilerp(a, b, x):
-    return (x - a) / (b - a)
-
-
-def weighted_median(values, weights, quantiles=0.5):
+def weighted_median(values:ndarray, weights:ndarray, quantiles:float=0.5):
     i = np.argsort(values)
     c = np.cumsum(weights[i])
     return values[i[np.searchsorted(c, np.array(quantiles) * c[-1])]]
 
 
-def chunks(length, count):
+def chunks(length: int, count: int):
     div, mod = divmod(length, count)
     start = 0
     for i in range(count):
