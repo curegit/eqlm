@@ -24,11 +24,11 @@ class Mode(Enum):
 modes = {m.name.lower(): m for m in Mode}
 
 
-def biprocess(x:ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, median=False, clip:tuple[float, float]|None=None) -> ndarray:
+def biprocess(x:ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, target:float|None=None,  median:bool=False, clip:tuple[float, float]|None=None) -> ndarray:
     k, l = n
     weights = np.ones_like(x) if alpha is None else alpha
-    z = process(x, weights, l, median=median, clip=clip) if l is not None and l >= 2 else x
-    return process(z.transpose(1, 0), weights.transpose(1, 0),  k, median=median, clip=clip).transpose((1, 0)) if k is not None and k >=2 else z
+    z = process(x, weights, l, target=target, median=median, clip=clip) if l is not None and l >= 2 else x
+    return process(z.transpose(1, 0), weights.transpose(1, 0),  k, target=target, median=median, clip=clip).transpose((1, 0)) if k is not None and k >=2 else z
 
 
 
@@ -60,7 +60,9 @@ def process(x:ndarray, w:ndarray, n:int=2, *, target:float|None=None, median:boo
         b2 = avg(values[:, i2:i3], w[:, i2:i3])
         bs.append(b2)
 
-    bg = lerp(np.min(bs),  np.max(bs), 1.0)
+
+
+    bg =  np.mean(bs) if target is None else lerp(np.min(bs),  np.max(bs), target)
     for i, ((i1, i2), (ix, i3)) in s:
         b1 = bs[i]
         b2 = bs[i + 1]
