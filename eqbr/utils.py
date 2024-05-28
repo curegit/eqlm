@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 from numpy import ndarray
 
 
@@ -19,3 +20,7 @@ def chunks(length: int, count: int):
         stop = start + div + (1 if i < mod else 0)
         yield start, stop
         start = stop
+
+def alt_filepath(filepath: str | Path, *, suffix: str = "+") -> Path:
+    path = Path(filepath).resolve()
+    return path if not path.exists() else alt_filepath(path.with_stem(path.stem + suffix), suffix=suffix)
