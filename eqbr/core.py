@@ -31,7 +31,7 @@ def biprocess(x:ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha:boo
     return process(z.transpose(1, 0), weights.transpose(1, 0),  k, median=median, clip=clip).transpose((1, 0)) if k is not None and k >=2 else z
 
 
-# TODO:
+
 def process(x:ndarray, w:ndarray, n:int=2, *, target:float|None=None, median:bool=False, clip:tuple[float, float]|None=None) -> ndarray:
     assert x.ndim == 2
     assert w.ndim == 2
