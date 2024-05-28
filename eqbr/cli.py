@@ -31,7 +31,6 @@ def main():
     mode = modes[args.mode]
     f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
     a = f(bgr)
-    print("Input:", a.shape)
     c = mode.value.channel
     a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, target=target, clip=(mode.value.min, mode.value.max))
 
