@@ -24,22 +24,22 @@ class Mode(Enum):
 modes = {m.name.lower(): m for m in Mode}
 
 
-def biprocess(x:ndarray, channel: int = 0, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, median=False, clip:tuple[float, float]|None=None) -> ndarray:
+def biprocess(x:ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, median=False, clip:tuple[float, float]|None=None) -> ndarray:
     k, l = n
-    weights = np.ones_like(x[channel]) if alpha is None else alpha
-    z = process(x, weights, channel, l, median=median, clip=clip) if l is not None and l >= 2 else x
-    return process(z.transpose(0, 2, 1), weights.transpose(1, 0), channel, k, median=median, clip=clip).transpose((0, 2, 1)) if k is not None and k >=2 else z
+    weights = np.ones_like(x) if alpha is None else alpha
+    z = process(x, weights, l, median=median, clip=clip) if l is not None and l >= 2 else x
+    return process(z.transpose(1, 0), weights.transpose(1, 0),  k, median=median, clip=clip).transpose((1, 0)) if k is not None and k >=2 else z
 
 
 # TODO:
-def process(x:ndarray, w:ndarray, channel:int=0, n:int=2, *, median:bool=False, clip:tuple[float, float]|None=None) -> ndarray:
-    assert x.ndim == 3
+def process(x:ndarray, w:ndarray, n:int=2, *, target:float|None=None, median:bool=False, clip:tuple[float, float]|None=None) -> ndarray:
+    assert x.ndim == 2
     assert w.ndim == 2
 
-    y = x.copy()
-    hs = list(chunks(x.shape[2], n))
+    y = np.zeros_like(x)
+    hs = list(chunks(x.shape[1], n))
 
-    values = x[channel]
+    values = x
 
     def avg(x, w):
         if median:
@@ -67,15 +67,15 @@ def process(x:ndarray, w:ndarray, channel:int=0, n:int=2, *, median:bool=False, 
         c1 = i1 + (i2 - i1) // 2
         c2 = i2 + (i3 - i2) // 2
         edge1 = i1 == 0
-        edge2 = i3 == x.shape[2]
+        edge2 = i3 == x.shape[1]
         k1 = i1 if edge1 else c1
         k2 = i3 if edge2 else c2
         ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1)).reshape((1, k2 - k1))
         grad = lerp(0.0, b1 - b2, ts)
         bias = bg - b1
 
-        r = x[channel, :, k1:k2] + grad.reshape((1, 1, k2 - k1)) + bias
+        r = x[ :, k1:k2] + grad.reshape((1, 1, k2 - k1)) + bias
 
 
-        y[channel, :, k1:k2] = r if clip is None else r.clip(*clip)
+        y[ :, k1:k2] = r if clip is None else r.clip(*clip)
     return y

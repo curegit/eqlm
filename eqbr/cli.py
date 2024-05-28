@@ -28,7 +28,9 @@ def main():
     f, g = color_transforms(mode.value.color, gamma=2.2, transpose=True)
     a = f(bgr)
     print("Input:", a.shape)
-    h = biprocess(a, channel=mode.value.channel, n=(vertical, horizontal), alpha=alpha, clip=(mode.value.min, mode.value.max))
-    y = g(h)
+    c = mode.value.channel
+    a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, clip=(mode.value.min, mode.value.max))
+
+    y = g(a)
     y = merge_alpha(y, alpha)
     save_image(y, o)
