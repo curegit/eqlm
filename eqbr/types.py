@@ -1,43 +1,62 @@
 from sys import float_info
+from pathlib import Path
 from math import isfinite
 
 
-def uint(string):
+def uint(string: str):
     value = int(string)
     if value >= 0:
         return value
     raise ValueError()
 
 
-def positive(str):
-    value = float(str)
+def positive(string: str):
+    value = float(string)
     if isfinite(value) and value >= float_info.epsilon:
         return value
     else:
         raise ValueError()
 
 
-def rate(str):
-    value = float(str)
+def rate(string: str):
+    value = float(string)
     if 0 <= value <= 1:
         return value
     else:
         raise ValueError()
 
 
-def nonempty(str):
-    if str:
-        return str
+def nonempty(string:str):
+    if string:
+        return string
     else:
         raise ValueError()
 
 
-def fileinput(str):
+def fileinput(string:str):
     # stdin (-) を None で返す
-    if str == "-":
+    if string == "-":
         return None
-    return nonempty(str)
+    p = Path(nonempty(string)).resolve(strict=True)
+    if p.is_file():
+        return p
+    else:
+        raise RuntimeError(f"No such file: {p}")
 
 
-def choice(label):
+def fileoutput(string:str):
+    # stdout (-) を None で返す
+    if string == "-":
+        return None
+    p = Path(nonempty(string))
+    if p.exists():
+        if p.is_file():
+            return p
+        else:
+            raise RuntimeError(f"Path already exists: {p}")
+    else:
+        return p
+
+
+def choice(label:str):
     return str.lower(label)

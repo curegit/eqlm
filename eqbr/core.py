@@ -24,7 +24,7 @@ class Mode(Enum):
 modes = {m.name.lower(): m for m in Mode}
 
 
-def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: bool = None, target: float | None = None, median: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
+def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: ndarray|None = None, target: float | None = None, median: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     k, l = n
     weights = np.ones_like(x) if alpha is None else alpha
     z = process(x, weights, l, target=target, median=median, clip=clip) if l is not None and l >= 2 else x
