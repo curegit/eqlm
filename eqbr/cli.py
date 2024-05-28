@@ -34,6 +34,7 @@ def main() -> int:
         parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="a")
         parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="a")
         parser.add_argument("-t", "--target", type=rate, help="")
+        parser.add_argument("-e", "--median", action="store_true", help="")
         parser.add_argument("-g", "--gamma", type=positive, nargs="?", const=2.2, help="gamma correction value")
         parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="a")
         args = parser.parse_args()
@@ -44,6 +45,7 @@ def main() -> int:
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
         target: float | None = args.target
+        median: bool = args.median
         gamma: float | None = args.gamma
         deep: bool = args.depth == 16
 
@@ -57,7 +59,7 @@ def main() -> int:
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
         a = f(bgr)
         c = mode.value.channel
-        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, target=target, clip=(mode.value.min, mode.value.max))
+        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, target=target, median=median, clip=(mode.value.min, mode.value.max))
 
         y = g(a)
         y = merge_alpha(y, alpha)
