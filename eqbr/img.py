@@ -80,7 +80,7 @@ def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool
         return y.transpose(2, 0, 1) if transpose else y
 
     def h(x: ndarray) -> ndarray:
-        z = cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r)
+        z = cv2.cvtColor(x.transpose(1, 2, 0) if transpose else x, r).clip(0.0, 1.0)
         return z if gamma is None else z ** (1 / gamma)
 
     return g, h
