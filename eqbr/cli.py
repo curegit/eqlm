@@ -25,10 +25,10 @@ def main():
     x = load_image(f)
     bgr, alpha = split_alpha(x)
     mode = modes[args.mode]
-    f, g = color_transforms(mode.value.color, transpose=True)
+    f, g = color_transforms(mode.value.color, gamma=2.2, transpose=True)
     a = f(bgr)
     print("Input:", a.shape)
-    h = biprocess(a, channel=mode.value.channel, n=(vertical, horizontal), alpha=alpha)
+    h = biprocess(a, channel=mode.value.channel, n=(vertical, horizontal), alpha=alpha, clip=(mode.value.min, mode.value.max))
     y = g(h)
     y = merge_alpha(y, alpha)
     save_image(y, o)

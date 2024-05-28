@@ -10,27 +10,29 @@ from .utils import lerp, chunks, weighted_median
 class ColorMode:
     color: Color
     channel: int
+    min: float = 0.0
+    max: float = 1.0
 
 
 class Mode(Enum):
     Brightness = ColorMode(color=Color.HSV, channel=2)
     Saturation = ColorMode(color=Color.HSV, channel=1)
     Lightness = ColorMode(color=Color.HLS, channel=1)
-    Luminance = ColorMode(color=Color.LAB, channel=0)
+    Luminance = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
 
 
 modes = {m.name.lower(): m for m in Mode}
 
 
-def biprocess(x:ndarray, channel: int = 0, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, median=False, ) -> ndarray:
+def biprocess(x:ndarray, channel: int = 0, n: tuple[int | None, int | None] = (2, 2), *, alpha:bool=None, median=False, clip:tuple[float, float]|None=None) -> ndarray:
     k, l = n
     weights = np.ones_like(x[channel]) if alpha is None else alpha
-    z = process(x, weights, channel, l, median=median) if l is not None and l >= 2 else x
-    return process(z.transpose(0, 2, 1), weights.transpose(1, 0), channel, k, median=median).transpose((0, 2, 1)) if k is not None and k >=2 else z
+    z = process(x, weights, channel, l, median=median, clip=clip) if l is not None and l >= 2 else x
+    return process(z.transpose(0, 2, 1), weights.transpose(1, 0), channel, k, median=median, clip=clip).transpose((0, 2, 1)) if k is not None and k >=2 else z
 
 
 # TODO:
-def process(x:ndarray, w:ndarray, channel:int=0, n:int=2, *, median=False) -> ndarray:
+def process(x:ndarray, w:ndarray, channel:int=0, n:int=2, *, median:bool=False, clip:tuple[float, float]|None=None) -> ndarray:
     assert x.ndim == 3
     assert w.ndim == 2
 
@@ -72,5 +74,8 @@ def process(x:ndarray, w:ndarray, channel:int=0, n:int=2, *, median=False) -> nd
         grad = lerp(0.0, b1 - b2, ts)
         bias = bg - b1
 
-        y[channel, :, k1:k2] = x[channel, :, k1:k2] + grad.reshape((1, 1, k2 - k1)) + bias
+        r = x[channel, :, k1:k2] + grad.reshape((1, 1, k2 - k1)) + bias
+
+
+        y[channel, :, k1:k2] = r if clip is None else r.clip(*clip)
     return y
