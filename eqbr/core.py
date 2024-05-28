@@ -15,10 +15,10 @@ class ColorMode:
 
 
 class Mode(Enum):
+    Luminance = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
     Brightness = ColorMode(color=Color.HSV, channel=2)
     Saturation = ColorMode(color=Color.HSV, channel=1)
     Lightness = ColorMode(color=Color.HLS, channel=1)
-    Luminance = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
 
 
 modes = {m.name.lower(): m for m in Mode}
