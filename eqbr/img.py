@@ -6,12 +6,12 @@ from io import BufferedIOBase
 from numpy import ndarray
 
 
-def load_image(filelike, *, normalize: bool = True) -> ndarray:
+def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True) -> ndarray:
     match filelike:
         case str() | Path() as path:
             with open(Path(path).resolve(strict=True), "rb") as fp:
                 buffer = fp.read()
-        case bytes() as buffer:
+        case bytes() | memoryview() as buffer:
             pass
         case _:
             raise ValueError()
@@ -38,7 +38,7 @@ def load_image(filelike, *, normalize: bool = True) -> ndarray:
             raise RuntimeError()
 
 
-def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False) -> None:
+def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False, icc_profile: bytes) -> None:
     match img.dtype:
         case np.float32:
             if prefer16:
@@ -56,6 +56,11 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
     if not ok:
         raise RuntimeError()
     buffer = bin.tobytes()
+
+    # ICCプロファイルをPNGデータに追加
+    icc_chunk = b'\x00\x00\x00' + len(icc_profile).to_bytes(4, 'big') + b'iCCP' + b'\x00' + b'\x00' + b'\x00' + icc_profile
+    buffer = buffer[:33] + icc_chunk + buffer[33:]
+
     match filelike:
         case str() | Path() as path:
             with open(Path(path), "wb") as fp:
@@ -64,6 +69,13 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
             stream.write(buffer)
         case _:
             raise ValueError()
+
+
+def get_icc():
+    maybe_icc = image.info.get("icc_profile")
+    if not prefer_embedded or maybe_icc is None:
+        return ImageCms.applyTransform(image, transform)
+    em_profile = ImageCms.ImageCmsProfile(io.BytesIO(maybe_icc))
 
 
 class Color(Enum):
