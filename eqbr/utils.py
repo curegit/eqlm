@@ -6,7 +6,7 @@ def lerp(a, b, t):
     return a + t * (b - a)
 
 
-def weighted_median(values:ndarray, weights:ndarray, quantiles:float=0.5):
+def weighted_median(values: ndarray, weights: ndarray, quantiles: float = 0.5):
     i = np.argsort(values)
     c = np.cumsum(weights[i])
     return values[i[np.searchsorted(c, np.array(quantiles) * c[-1])]]
