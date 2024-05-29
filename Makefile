@@ -21,7 +21,7 @@ clean:
 	python3 -c 'import shutil; shutil.rmtree("eqbr.egg-info", ignore_errors=True)'
 
 format:
-	python3 -m black -l 200 eqbr
+	python3 -m black -l 300 eqbr
 
 check:
 	python3 -m mypy eqbr
