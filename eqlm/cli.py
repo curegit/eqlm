@@ -51,6 +51,8 @@ def main() -> int:
 
         x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True)
 
+        eprint(f"Size: {x.shape[1]}x{x.shape[0]}")
+        eprint(f"Grid: {horizontal or 1}x{vertical or 1}")
         eprint("Process ...")
 
         bgr, alpha = split_alpha(x)
