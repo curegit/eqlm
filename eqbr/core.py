@@ -44,8 +44,6 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
         else:
             return np.average(x, weights=w)
 
-    def progress():
-        pass
 
     s = list(enumerate(zip(hs[:-1], hs[1:])))
 

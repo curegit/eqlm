@@ -64,7 +64,6 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
 
     # ICCプロファイルをPNGデータに追加
     if icc_profile is not None:
-        print("ICC")
         buffer = embed_icc_png(buffer, icc_profile)
 
 
@@ -102,10 +101,9 @@ def embed_icc_png(png_bytes: bytes, icc_profile: bytes) -> bytes:
         assert ((offset == 8 and length == 13) if chunk_type == b"IHDR" else True)
         offset += 4 + 4 + length + 4
 
-
-    compobj = zlib.compressobj(method=zlib.DEFLATED)
-    deflated = compobj.compress(icc_profile)
-    deflated += compobj.flush()
+    comp_stream = zlib.compressobj(method=zlib.DEFLATED)
+    deflated = comp_stream.compress(icc_profile)
+    deflated += comp_stream.flush()
     iccp_chunk_type = b'iCCP'
     iccp_chunk_data = b'ICC Profile' + bytes.fromhex("0000") + deflated
     iccp_length = struct.pack("!I", len(iccp_chunk_data))

@@ -51,7 +51,7 @@ def main() -> int:
 
 
 
-        eprint("Done")
+        eprint("Process ...")
 
         x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if inp is None else inp, normalize=True)
         bgr, alpha = split_alpha(x)
@@ -63,7 +63,7 @@ def main() -> int:
 
         y = g(a)
         y = merge_alpha(y, alpha)
-        eprint("Done")
+        eprint("Saving ...")
 
 
         if o is None:
