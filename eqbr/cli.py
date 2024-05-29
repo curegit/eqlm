@@ -53,7 +53,7 @@ def main() -> int:
 
         eprint("Done")
 
-        x = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if inp is None else inp, normalize=True)
+        x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if inp is None else inp, normalize=True)
         bgr, alpha = split_alpha(x)
 
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
@@ -69,14 +69,14 @@ def main() -> int:
         if o is None:
             try:
                 with io.BytesIO() as buf:
-                    save_image(y, buf, prefer16=deep)
+                    save_image(y, buf, prefer16=deep, icc_profile=icc)
                     sys.stdout.buffer.write(buf.getbuffer())
             except BrokenPipeError:
                 exit_code = 128 + 13
                 devnull = os.open(os.devnull, os.O_WRONLY)
                 os.dup2(devnull, sys.stdout.fileno())
         else:
-                save_image(y, o, prefer16=deep)
+                save_image(y, o, prefer16=deep, icc_profile=icc)
         return exit_code
 
     except KeyboardInterrupt:

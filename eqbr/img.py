@@ -1,12 +1,16 @@
+import io
+import struct
+import zlib
 import cv2
 import numpy as np
 from pathlib import Path
 from enum import Enum
 from io import BufferedIOBase
 from numpy import ndarray
+from PIL import Image
 
 
-def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True) -> ndarray:
+def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True) -> tuple[ndarray, bytes | None]:
     match filelike:
         case str() | Path() as path:
             with open(Path(path).resolve(strict=True), "rb") as fp:
@@ -15,6 +19,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
             pass
         case _:
             raise ValueError()
+    icc = extract_icc(buffer)
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
     # flags = cv2.IMREAD_COLOR | cv2.IMREAD_ANYDEPTH
@@ -24,21 +29,21 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
     match img.dtype:
         case np.uint8:
             if normalize:
-                return (img / (2**8 - 1)).astype(np.float32)
+                return (img / (2**8 - 1)).astype(np.float32), icc
             else:
-                return img
+                return img, icc
         case np.uint16:
             if normalize:
-                return (img / (2**16 - 1)).astype(np.float32)
+                return (img / (2**16 - 1)).astype(np.float32), icc
             else:
-                return img
+                return img, icc
         case np.float32:
-            return img
+            return img, icc
         case _:
             raise RuntimeError()
 
 
-def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False, icc_profile: bytes) -> None:
+def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False, icc_profile: bytes|None=None) -> None:
     match img.dtype:
         case np.float32:
             if prefer16:
@@ -58,8 +63,10 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
     buffer = bin.tobytes()
 
     # ICCプロファイルをPNGデータに追加
-    icc_chunk = b'\x00\x00\x00' + len(icc_profile).to_bytes(4, 'big') + b'iCCP' + b'\x00' + b'\x00' + b'\x00' + icc_profile
-    buffer = buffer[:33] + icc_chunk + buffer[33:]
+    if icc_profile is not None:
+        print("ICC")
+        buffer = embed_icc_png(buffer, icc_profile)
+
 
     match filelike:
         case str() | Path() as path:
@@ -84,15 +91,27 @@ def extract_icc(img_bytes: bytes | memoryview) -> bytes | None:
 
 
 def embed_icc_png(png_bytes: bytes, icc_profile: bytes) -> bytes:
-        comprobj = zlib.compressobj(method=zlib.DEFLATED)
-        deflated = comprobj.compress(icc_profile)
-        deflated += comprobj.flush()
-        chunk_type = b'iCCP'
-        chunk_data = b'ICC Profile' + bytes.fromhex("0000") + deflated
-        length = struct.pack("!I", len(chunk_data))
-        crc = struct.pack("!I", zlib.crc32(chunk_type + chunk_data, 0))
-        iccp_chunk = length + chunk_type + chunk_data + crc
-        return png_bytes[:33] + iccp_chunk + png_bytes[33:]
+    assert png_bytes[:8] == bytes.fromhex("89504E470D0A1A0A")
+
+    chunk_type = None
+    offset = 8
+    while chunk_type != b'IDAT':
+        (length,) = struct.unpack("!I", png_bytes[offset: offset+4])
+        chunk_type = png_bytes[offset+4: offset+8]
+        assert chunk_type != b"sRGB" and chunk_type != b"iCCP"
+        assert ((offset == 8 and length == 13) if chunk_type == b"IHDR" else True)
+        offset += 4 + 4 + length + 4
+
+
+    compobj = zlib.compressobj(method=zlib.DEFLATED)
+    deflated = compobj.compress(icc_profile)
+    deflated += compobj.flush()
+    iccp_chunk_type = b'iCCP'
+    iccp_chunk_data = b'ICC Profile' + bytes.fromhex("0000") + deflated
+    iccp_length = struct.pack("!I", len(iccp_chunk_data))
+    iccp_crc = struct.pack("!I", zlib.crc32(iccp_chunk_type + iccp_chunk_data, 0))
+    iccp_chunk = iccp_length + iccp_chunk_type + iccp_chunk_data + iccp_crc
+    return png_bytes[:33] + iccp_chunk + png_bytes[33:]
 
 
 class Color(Enum):
