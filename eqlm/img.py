@@ -46,13 +46,13 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16:
     match img.dtype:
         case np.float32:
             if prefer16:
-                qt = 2**16 - 1
-                dtype = np.uint16
-                arr = np.rint(img * qt).clip(0, qt).astype(dtype)
+                qt16 = 2**16 - 1
+                dtype16 = np.uint16
+                arr = np.rint(img * qt16).clip(0, qt16).astype(dtype16)
             else:
-                qt = 2**8 - 1
-                dtype = np.uint8
-                arr = np.rint(img * qt).clip(0, qt).astype(dtype)
+                qt8 = 2**8 - 1
+                dtype8 = np.uint8
+                arr = np.rint(img * qt8).clip(0, qt8).astype(dtype8)
         case np.uint8 | np.uint16:
             arr = img
         case _:
@@ -77,7 +77,7 @@ def extract_icc(img_bytes: bytes | memoryview) -> bytes | None:
     buf = io.BytesIO(img_bytes)
     image = Image.open(buf)
     maybe_icc = image.info.get("icc_profile")
-    if maybe_icc is None:
+    if not maybe_icc:
         return None
     else:
         assert isinstance(maybe_icc, bytes)
