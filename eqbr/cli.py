@@ -3,11 +3,11 @@ import os
 import io
 from pathlib import Path
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-
 from .core import Mode, biprocess, modes
 from .img import load_image, save_image, split_alpha, merge_alpha, color_transforms
 from .types import fileinput, fileoutput, choice, uint, positive, rate
 from .utils import alt_filepath
+
 
 def main() -> int:
     from . import __version__ as version
@@ -16,16 +16,16 @@ def main() -> int:
         print(*args, **kwargs, file=sys.stderr)
 
     class Auto:
-
         def __str__(self) -> str:
             return "Auto"
 
         @staticmethod
-        def name(input_path: Path | str, suffix: str="-eqlm", ext=".png") -> Path:
-            p = Path(input_path).resolve()
-            return alt_filepath(p.with_stem(p.stem + suffix).with_suffix(ext))
+        def name(input_path: Path | str, *, suffix: str = "-eqlm", ext=".png") -> Path:
+            path = Path(input_path).resolve()
+            return alt_filepath(path.with_stem(path.stem + suffix).with_suffix(ext))
 
     exit_code = 0
+
     try:
         parser = ArgumentParser(prog="eqbr", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Halftone Converter: an image converter to generate halftone images")
         parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="describe input image files (pass '-' to specify stdin)")
@@ -39,8 +39,8 @@ def main() -> int:
         parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="a")
         args = parser.parse_args()
 
-        inp: Path | None = args.input
-        o: Path | None = Auto.name("stdin" if inp is None else inp) if isinstance(args.output, Auto) else args.output
+        input_file: Path | None = args.input
+        output_file: Path | None = Auto.name("stdin" if input_file is None else input_file) if isinstance(args.output, Auto) else args.output
         mode: Mode = modes[args.mode]
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
@@ -49,24 +49,20 @@ def main() -> int:
         gamma: float | None = args.gamma
         deep: bool = args.depth == 16
 
-
+        x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True)
 
         eprint("Process ...")
 
-        x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if inp is None else inp, normalize=True)
         bgr, alpha = split_alpha(x)
-
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
         a = f(bgr)
         c = mode.value.channel
         a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, target=target, median=median, clip=(mode.value.min, mode.value.max))
+        y = merge_alpha(g(a), alpha)
 
-        y = g(a)
-        y = merge_alpha(y, alpha)
         eprint("Saving ...")
 
-
-        if o is None:
+        if output_file is None:
             try:
                 with io.BytesIO() as buf:
                     save_image(y, buf, prefer16=deep, icc_profile=icc)
@@ -76,7 +72,7 @@ def main() -> int:
                 devnull = os.open(os.devnull, os.O_WRONLY)
                 os.dup2(devnull, sys.stdout.fileno())
         else:
-                save_image(y, o, prefer16=deep, icc_profile=icc)
+            save_image(y, output_file, prefer16=deep, icc_profile=icc)
         return exit_code
 
     except KeyboardInterrupt:

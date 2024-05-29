@@ -3,7 +3,7 @@ from pathlib import Path
 from numpy import ndarray
 
 
-def lerp(a, b, t):
+def lerp(a, b, /, t):
     return a + t * (b - a)
 
 
@@ -20,6 +20,7 @@ def chunks(length: int, count: int):
         stop = start + div + (1 if i < mod else 0)
         yield start, stop
         start = stop
+
 
 def alt_filepath(filepath: str | Path, *, suffix: str = "+") -> Path:
     path = Path(filepath).resolve()

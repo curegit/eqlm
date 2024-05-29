@@ -3,8 +3,8 @@ import struct
 import zlib
 import cv2
 import numpy as np
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 from io import BufferedIOBase
 from numpy import ndarray
 from PIL import Image
@@ -22,10 +22,9 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
     icc = extract_icc(buffer)
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
-    # flags = cv2.IMREAD_COLOR | cv2.IMREAD_ANYDEPTH
-    # if not orient:
-    #    flags |= cv2.IMREAD_IGNORE_ORIENTATION
     img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED)
+    if img.shape[2] not in [3, 4]:
+        raise RuntimeError("Only RGB[A] color images supported")
     match img.dtype:
         case np.uint8:
             if normalize:
@@ -40,33 +39,30 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
         case np.float32:
             return img, icc
         case _:
-            raise RuntimeError()
+            raise RuntimeError("Unsupported image")
 
 
-def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=False, icc_profile: bytes|None=None) -> None:
+def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16: bool = False, icc_profile: bytes | None = None) -> None:
     match img.dtype:
         case np.float32:
             if prefer16:
                 qt = 2**16 - 1
                 dtype = np.uint16
+                arr = np.rint(img * qt).clip(0, qt).astype(dtype)
             else:
                 qt = 2**8 - 1
                 dtype = np.uint8
-            arr = np.rint(img * qt).clip(0, qt).astype(dtype)
+                arr = np.rint(img * qt).clip(0, qt).astype(dtype)
         case np.uint8 | np.uint16:
             arr = img
         case _:
             raise ValueError()
     ok, bin = cv2.imencode(".png", arr, [cv2.IMWRITE_PNG_COMPRESSION, 9])
     if not ok:
-        raise RuntimeError()
+        raise RuntimeError("PNG encoding failed")
     buffer = bin.tobytes()
-
-    # ICCプロファイルをPNGデータに追加
     if icc_profile is not None:
         buffer = embed_icc_png(buffer, icc_profile)
-
-
     match filelike:
         case str() | Path() as path:
             with open(Path(path), "wb") as fp:
@@ -82,30 +78,27 @@ def extract_icc(img_bytes: bytes | memoryview) -> bytes | None:
     image = Image.open(buf)
     maybe_icc = image.info.get("icc_profile")
     if maybe_icc is None:
-      return None
+        return None
     else:
-      assert isinstance(maybe_icc, bytes)
-      return maybe_icc
-
+        assert isinstance(maybe_icc, bytes)
+        return maybe_icc
 
 
 def embed_icc_png(png_bytes: bytes, icc_profile: bytes) -> bytes:
     assert png_bytes[:8] == bytes.fromhex("89504E470D0A1A0A")
-
     chunk_type = None
     offset = 8
-    while chunk_type != b'IDAT':
-        (length,) = struct.unpack("!I", png_bytes[offset: offset+4])
-        chunk_type = png_bytes[offset+4: offset+8]
+    while chunk_type != b"IDAT":
+        (length,) = struct.unpack("!I", png_bytes[offset : offset + 4])
+        chunk_type = png_bytes[offset + 4 : offset + 8]
         assert chunk_type != b"sRGB" and chunk_type != b"iCCP"
-        assert ((offset == 8 and length == 13) if chunk_type == b"IHDR" else True)
+        assert (offset == 8 and length == 13) if chunk_type == b"IHDR" else True
         offset += 4 + 4 + length + 4
-
     comp_stream = zlib.compressobj(method=zlib.DEFLATED)
     deflated = comp_stream.compress(icc_profile)
     deflated += comp_stream.flush()
-    iccp_chunk_type = b'iCCP'
-    iccp_chunk_data = b'ICC Profile' + bytes.fromhex("0000") + deflated
+    iccp_chunk_type = b"iCCP"
+    iccp_chunk_data = b"ICC Profile" + bytes.fromhex("0000") + deflated
     iccp_length = struct.pack("!I", len(iccp_chunk_data))
     iccp_crc = struct.pack("!I", zlib.crc32(iccp_chunk_type + iccp_chunk_data, 0))
     iccp_chunk = iccp_length + iccp_chunk_type + iccp_chunk_data + iccp_crc

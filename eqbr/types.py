@@ -26,37 +26,40 @@ def rate(string: str):
         raise ValueError()
 
 
-def nonempty(string:str):
+def nonempty(string: str):
     if string:
         return string
     else:
         raise ValueError()
 
 
-def fileinput(string:str):
+def fileinput(string: str):
     # stdin (-) を None で返す
     if string == "-":
         return None
-    p = Path(nonempty(string)).resolve(strict=True)
-    if p.is_file():
-        return p
+    path = Path(nonempty(string)).resolve(strict=True)
+    if path.is_file():
+        return path
     else:
-        raise RuntimeError(f"No such file: {p}")
+        raise RuntimeError(f"No such file: {path}")
 
 
-def fileoutput(string:str):
+def fileoutput(string: str):
     # stdout (-) を None で返す
     if string == "-":
         return None
-    p = Path(nonempty(string))
-    if p.exists():
-        if p.is_file():
-            return p
+    path = Path(nonempty(string)).resolve()
+    if path.exists():
+        if path.is_file():
+            return path
         else:
-            raise RuntimeError(f"Path already exists: {p}")
+            raise RuntimeError(f"Path already exists: {path}")
     else:
-        return p
+        if path.parent.is_dir():
+            return path
+        else:
+            raise RuntimeError(f"Parent directory doesn't exist: {path}")
 
 
-def choice(label:str):
+def choice(label: str):
     return str.lower(label)
