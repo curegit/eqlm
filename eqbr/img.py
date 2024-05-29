@@ -71,11 +71,28 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16=
             raise ValueError()
 
 
-def get_icc():
+def extract_icc(img_bytes: bytes | memoryview) -> bytes | None:
+    buf = io.BytesIO(img_bytes)
+    image = Image.open(buf)
     maybe_icc = image.info.get("icc_profile")
-    if not prefer_embedded or maybe_icc is None:
-        return ImageCms.applyTransform(image, transform)
-    em_profile = ImageCms.ImageCmsProfile(io.BytesIO(maybe_icc))
+    if maybe_icc is None:
+      return None
+    else:
+      assert isinstance(maybe_icc, bytes)
+      return maybe_icc
+
+
+
+def embed_icc_png(png_bytes: bytes, icc_profile: bytes) -> bytes:
+        comprobj = zlib.compressobj(method=zlib.DEFLATED)
+        deflated = comprobj.compress(icc_profile)
+        deflated += comprobj.flush()
+        chunk_type = b'iCCP'
+        chunk_data = b'ICC Profile' + bytes.fromhex("0000") + deflated
+        length = struct.pack("!I", len(chunk_data))
+        crc = struct.pack("!I", zlib.crc32(chunk_type + chunk_data, 0))
+        iccp_chunk = length + chunk_type + chunk_data + crc
+        return png_bytes[:33] + iccp_chunk + png_bytes[33:]
 
 
 class Color(Enum):
