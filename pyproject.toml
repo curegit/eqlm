@@ -1,5 +1,5 @@
 [project]
-name = "eqbr"
+name = "eqlm"
 description = "Simple CLI tool to spatially equalize image brightness"
 keywords = ["image processing", "brightness", "saturation", "lightness", "luminance"]
 requires-python = ">=3.12"
@@ -17,7 +17,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "numpy >= 1.26.0",
-  "opencv-python-headless >= 4.9.0",
+  "opencv-python >= 4.9.0",
   "pillow >= 9.3.0",
 ]
 
@@ -25,15 +25,15 @@ dependencies = [
 dev = ["pip", "setuptools", "build", "twine", "black", "mypy"]
 
 [project.urls]
-homepage = "https://github.com/curegit/eqbr"
-repository = "https://github.com/curegit/eqbr.git"
+homepage = "https://github.com/curegit/eqlm"
+repository = "https://github.com/curegit/eqlm.git"
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["eqbr"]
+packages = ["eqlm"]
 
 [tool.setuptools.dynamic]
-version = {attr = "eqbr.__version__"}
+version = {attr = "eqlm.__version__"}

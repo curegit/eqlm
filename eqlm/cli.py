@@ -27,7 +27,7 @@ def main() -> int:
     exit_code = 0
 
     try:
-        parser = ArgumentParser(prog="eqbr", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Halftone Converter: an image converter to generate halftone images")
+        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Halftone Converter: an image converter to generate halftone images")
         parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="describe input image files (pass '-' to specify stdin)")
         parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="describe input image files (pass '-' to specify stdin)")
         parser.add_argument("-v", "--version", action="version", version=version)

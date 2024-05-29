@@ -10,18 +10,18 @@ devinstall: build
 	pip3 install -e .[dev]
 
 preview: build
-	python3 -m twine upload -u __token__ --repository-url "https://test.pypi.org/legacy/" dist/*
+	false && python3 -m twine upload -u __token__ --repository-url "https://test.pypi.org/legacy/" dist/*
 
 publish: build
-	python3 -m twine upload -u __token__ --repository-url "https://upload.pypi.org/legacy/" dist/*
+	false && python3 -m twine upload -u __token__ --repository-url "https://upload.pypi.org/legacy/" dist/*
 
 clean:
 	python3 -c 'import shutil; shutil.rmtree("dist", ignore_errors=True)'
 	python3 -c 'import shutil; shutil.rmtree("build", ignore_errors=True)'
-	python3 -c 'import shutil; shutil.rmtree("eqbr.egg-info", ignore_errors=True)'
+	python3 -c 'import shutil; shutil.rmtree("eqlm.egg-info", ignore_errors=True)'
 
 format:
-	python3 -m black -l 300 eqbr
+	python3 -m black -l 300 eqlm
 
 check:
-	python3 -m mypy eqbr
+	python3 -m mypy eqlm
