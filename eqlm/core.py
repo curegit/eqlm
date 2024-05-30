@@ -34,7 +34,9 @@ def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: n
 def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, median: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     assert n >= 2
     assert x.ndim == w.ndim == 2
-    y = np.zeros_like(x)
+    if x.shape[1] < n:
+        raise ValueError("Too many divisions")
+    dest = np.zeros_like(x)
     divs = list(chunks(x.shape[1], n))
 
     def aggregate(x, w):
@@ -65,6 +67,6 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
         ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1)).reshape((1, k2 - k1))
         grad = lerp(0.0, v1 - v2, ts)
         bias = vt - v1
-        r = x[:, k1:k2] + grad.reshape((1, k2 - k1)) + bias
-        y[:, k1:k2] = r if clip is None else r.clip(*clip)
-    return y
+        y = x[:, k1:k2] + grad.reshape((1, k2 - k1)) + bias
+        dest[:, k1:k2] = y if clip is None else y.clip(*clip)
+    return dest

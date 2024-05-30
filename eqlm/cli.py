@@ -24,19 +24,24 @@ def main() -> int:
             path = Path(input_path).resolve()
             return alt_filepath(path.with_stem(path.stem + suffix).with_suffix(ext))
 
+    class Average:
+        def __str__(self) -> str:
+            return "Average"
+
     exit_code = 0
 
     try:
-        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Halftone Converter: an image converter to generate halftone images")
-        parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="describe input image files (pass '-' to specify stdin)")
-        parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="describe input image files (pass '-' to specify stdin)")
+        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to spatially equalize image luminance")
+        parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin)")
+        parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
         parser.add_argument("-v", "--version", action="version", version=version)
-        parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="a")
-        parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="a")
-        parser.add_argument("-t", "--target", type=rate, help="")
-        parser.add_argument("-e", "--median", action="store_true", help="")
-        parser.add_argument("-g", "--gamma", type=positive, nargs="?", const=2.2, help="gamma correction value")
-        parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="a")
+        parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
+        parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN blocks to aggregate (Note that it doesn't respect Exif Orientation)")
+        parser.add_argument("-t", "--target", type=rate, default=Average(), help="output level target, 0.0 (min) to 1.0 (max)")
+        parser.add_argument("-e", "--median", action="store_true", help="aggregate each block using median")
+        parser.add_argument("-u", "--unweighted", action="store_true", help="disable alpha channel weighting")
+        parser.add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
+        parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
         args = parser.parse_args()
 
         input_file: Path | None = args.input
@@ -44,8 +49,9 @@ def main() -> int:
         mode: Mode = modes[args.mode]
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
-        target: float | None = args.target
+        target: float | None = None if isinstance(args.target, Average) else args.target
         median: bool = args.median
+        unweighted: bool = args.unweighted
         gamma: float | None = args.gamma
         deep: bool = args.depth == 16
 
@@ -59,7 +65,7 @@ def main() -> int:
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
         a = f(bgr)
         c = mode.value.channel
-        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=alpha, target=target, median=median, clip=(mode.value.min, mode.value.max))
+        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=(None if unweighted else alpha), target=target, median=median, clip=(mode.value.min, mode.value.max))
         y = merge_alpha(g(a), alpha)
 
         eprint("Saving ...")
