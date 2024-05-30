@@ -1,6 +1,6 @@
 [project]
 name = "eqlm"
-description = "Simple CLI tool to spatially equalize image brightness"
+description = "Simple CLI tool to spatially equalize image luminance"
 keywords = ["image processing", "brightness", "saturation", "lightness", "luminance"]
 requires-python = ">=3.12"
 readme = "README.md"
