@@ -24,6 +24,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pip", "setuptools", "build", "twine", "black", "mypy"]
 
+[project.scripts]
+eqlm = "eqlm.cli:main"
+
 [project.urls]
 homepage = "https://github.com/curegit/eqlm"
 repository = "https://github.com/curegit/eqlm.git"
