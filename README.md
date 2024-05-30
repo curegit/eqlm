@@ -16,7 +16,7 @@ The main program can be invoked either through the `eqlm` command or through the
 
 ```txt
 usage: eqlm [-h] [-v] [-m {luminance,brightness,saturation,lightness}]
-            [-n M N] [-t TARGET] [-e] [-u] [-g [GAMMA]] [-d {8,16}]
+            [-n M N] [-t RATE] [-e] [-u] [-g [GAMMA]] [-d {8,16}]
             IN_FILE [OUT_FILE]
 
 Simple CLI tool to spatially equalize image luminance
@@ -31,10 +31,10 @@ options:
   -v, --version         show program's version number and exit
   -m {luminance,brightness,saturation,lightness}, --mode {luminance,brightness,saturation,lightness}
                         processing mode (default: luminance)
-  -n M N, --divide M N  divide image into MxN blocks to aggregate (Note that
-                        it doesn't respect Exif Orientation) (default: (2, 2))
-  -t TARGET, --target TARGET
-                        output level target, 0.0 (min) to 1.0 (max) (default: Average)
+  -n M N, --divide M N  divide image into MxN blocks for aggregation
+                        (note that it doesn't respect Exif orientation) (default: (2, 2))
+  -t RATE, --target RATE
+                        output level target rate, 0.0 (min) to 1.0 (max) (default: Average)
   -e, --median          aggregate each block using median (default: False)
   -u, --unweighted      disable alpha channel weighting (default: False)
   -g [GAMMA], --gamma [GAMMA]
