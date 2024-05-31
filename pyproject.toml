@@ -1,7 +1,7 @@
 [project]
 name = "eqlm"
 description = "Simple CLI tool to spatially equalize image luminance"
-keywords = ["image processing", "brightness", "saturation", "lightness", "luminance"]
+keywords = ["image processing", "image manipulation", "brightness", "saturation", "lightness", "luminance"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "AGPL-3.0"}
