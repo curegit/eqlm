@@ -24,14 +24,14 @@ class Mode(Enum):
 modes = {m.name.lower(): m for m in Mode}
 
 
-def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: ndarray | None = None, target: float | None = None, median: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
+def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: ndarray | None = None, target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     k, l = n
     weights = np.ones_like(x) if alpha is None else alpha
-    z = process(x, weights, l, target=target, median=median, clip=clip) if l is not None and l >= 2 else x
-    return process(z.transpose(1, 0), weights.transpose(1, 0), k, target=target, median=median, clip=clip).transpose((1, 0)) if k is not None and k >= 2 else z
+    z = process(x, weights, l, target=target, median=median, clamp=clamp, clip=clip) if l is not None and l >= 2 else x
+    return process(z.transpose(1, 0), weights.transpose(1, 0), k, target=target, median=median, clamp=clamp, clip=clip).transpose((1, 0)) if k is not None and k >= 2 else z
 
 
-def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, median: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
+def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     assert n >= 2
     assert x.ndim == w.ndim == 2
     if x.shape[1] < n:
@@ -65,6 +65,8 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
         k1 = i1 if edge1 else c1
         k2 = i3 if edge2 else c2
         ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1)).reshape((1, k2 - k1))
+        if clamp:
+            ts = ts.clip(0.0, 1.0)
         grad = lerp(0.0, v1 - v2, ts)
         bias = vt - v1
         y = x[:, k1:k2] + grad.reshape((1, k2 - k1)) + bias

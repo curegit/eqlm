@@ -16,11 +16,13 @@ The main program can be invoked either through the `eqlm` command or through the
 
 ```txt
 usage: eqlm [-h] [-v] [-m {luminance,brightness,saturation,lightness}]
-            [-n M N] [-t RATE] [-e] [-u] [-g [GAMMA]] [-d {8,16}]
+            [-n M N] [-t RATE] [-c] [-e] [-u] [-g [GAMMA]] [-d {8,16}]
             IN_FILE [OUT_FILE]
+```
 
-Simple CLI tool to spatially equalize image luminance
+### Options
 
+```
 positional arguments:
   IN_FILE               input image file path (use '-' for stdin)
   OUT_FILE              output PNG image file path (use '-' for stdout)

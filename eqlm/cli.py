@@ -38,6 +38,7 @@ def main() -> int:
         parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
         parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN blocks for aggregation (note that it doesn't respect Exif orientation)")
         parser.add_argument("-t", "--target", metavar="RATE", type=rate, default=Average(), help="output level target rate, 0.0 (min) to 1.0 (max)")
+        parser.add_argument("-c", "--clamp", action="store_true", help="")
         parser.add_argument("-e", "--median", action="store_true", help="aggregate each block using median")
         parser.add_argument("-u", "--unweighted", action="store_true", help="disable alpha channel weighting")
         parser.add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
@@ -50,6 +51,7 @@ def main() -> int:
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
         target: float | None = None if isinstance(args.target, Average) else args.target
+        clamp: bool = args.clamp
         median: bool = args.median
         unweighted: bool = args.unweighted
         gamma: float | None = args.gamma
@@ -65,7 +67,7 @@ def main() -> int:
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
         a = f(bgr)
         c = mode.value.channel
-        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=(None if unweighted else alpha), target=target, median=median, clip=(mode.value.min, mode.value.max))
+        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=(None if unweighted else alpha), target=target, median=median, clamp=clamp, clip=(mode.value.min, mode.value.max))
         y = merge_alpha(g(a), alpha)
 
         eprint("Saving ...")
