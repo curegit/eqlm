@@ -58,7 +58,7 @@ def fileoutput(string: str):
         if path.parent.is_dir():
             return path
         else:
-            raise RuntimeError(f"Parent directory doesn't exist: {path}")
+            raise RuntimeError(f"Destination directory doesn't exist: {path.parent}")
 
 
 def choice(label: str):

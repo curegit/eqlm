@@ -10,7 +10,7 @@ from numpy import ndarray
 from PIL import Image
 
 
-def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True) -> tuple[ndarray, bytes | None]:
+def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True, orientation: bool = True) -> tuple[ndarray, bytes | None]:
     match filelike:
         case str() | Path() as path:
             with open(Path(path).resolve(strict=True), "rb") as fp:
@@ -19,10 +19,16 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
             pass
         case _:
             raise ValueError()
-    icc = extract_icc(buffer)
+    try:
+        icc = extract_icc(buffer)
+    except Exception:
+        icc = None
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
-    img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED)
+    if orientation:
+        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_IGNORE_ORIENTATION)
+    else:
+        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED)
     if img.shape[2] not in [3, 4]:
         raise RuntimeError("Only RGB[A] color images supported")
     match img.dtype:
