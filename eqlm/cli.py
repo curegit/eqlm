@@ -36,13 +36,14 @@ def main() -> int:
         parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
         parser.add_argument("-v", "--version", action="version", version=version)
         parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
-        parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN blocks for aggregation (note that it doesn't respect Exif orientation)")
+        parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN blocks for aggregation")
         parser.add_argument("-t", "--target", metavar="RATE", type=rate, default=Average(), help="output level target rate, 0.0 (min) to 1.0 (max)")
         parser.add_argument("-c", "--clamp", action="store_true", help="")
         parser.add_argument("-e", "--median", action="store_true", help="aggregate each block using median")
         parser.add_argument("-u", "--unweighted", action="store_true", help="disable alpha channel weighting")
         parser.add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
         parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
+        parser.add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore Exif orientation")
         args = parser.parse_args()
 
         input_file: Path | None = args.input
@@ -56,8 +57,9 @@ def main() -> int:
         unweighted: bool = args.unweighted
         gamma: float | None = args.gamma
         deep: bool = args.depth == 16
+        orientation: bool = not args.no_orientation
 
-        x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True)
+        x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True, orientation=orientation)
 
         eprint(f"Size: {x.shape[1]}x{x.shape[0]}")
         eprint(f"Grid: {horizontal or 1}x{vertical or 1}")
