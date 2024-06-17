@@ -48,14 +48,14 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
 
     divpairs = list(enumerate(zip(divs[:-1], divs[1:])))
     vs = []
-    for i, ((i1, i2), (ix, i3)) in divpairs:
+    for i, ((i1, i2), (_, i3)) in divpairs:
         if i == 0:
             v1 = aggregate(x[:, i1:i2], w[:, i1:i2])
             vs.append(v1)
         v2 = aggregate(x[:, i2:i3], w[:, i2:i3])
         vs.append(v2)
     vt = np.mean(vs) if target is None else lerp(np.min(vs), np.max(vs), target)
-    for i, ((i1, i2), (ix, i3)) in divpairs:
+    for i, ((i1, i2), (_, i3)) in divpairs:
         v1 = vs[i]
         v2 = vs[i + 1]
         c1 = i1 + (i2 - i1) // 2
