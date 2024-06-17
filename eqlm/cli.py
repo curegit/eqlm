@@ -20,9 +20,9 @@ def main() -> int:
             return "Auto"
 
         @staticmethod
-        def name(input_path: Path | str, *, suffix: str = "-eqlm", ext=".png") -> Path:
+        def name(input_path: Path | str, *, suffix: str = "-eqlm", ext=f"{os.extsep}png") -> Path:
             path = Path(input_path).resolve()
-            return alt_filepath(path.with_stem(path.stem + suffix).with_suffix(ext))
+            return alt_filepath((Path(".") / (path.stem + suffix)).with_suffix(ext))
 
     class Average:
         def __str__(self) -> str:
@@ -46,7 +46,7 @@ def main() -> int:
         args = parser.parse_args()
 
         input_file: Path | None = args.input
-        output_file: Path | None = Auto.name("stdin" if input_file is None else input_file) if isinstance(args.output, Auto) else args.output
+        output_file: Path | Auto | None = args.output
         mode: Mode = modes[args.mode]
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
@@ -74,15 +74,21 @@ def main() -> int:
 
         if output_file is None:
             try:
-                with io.BytesIO() as buf:
-                    save_image(y, buf, prefer16=deep, icc_profile=icc)
-                    sys.stdout.buffer.write(buf.getbuffer())
+                buf = io.BytesIO()
+                save_image(y, buf, prefer16=deep, icc_profile=icc)
+                sys.stdout.buffer.write(buf.getbuffer())
             except BrokenPipeError:
                 exit_code = 128 + 13
                 devnull = os.open(os.devnull, os.O_WRONLY)
                 os.dup2(devnull, sys.stdout.fileno())
         else:
-            save_image(y, output_file, prefer16=deep, icc_profile=icc)
+            if isinstance(output_file, Auto):
+                output_path = Auto.name("stdin" if input_file is None else input_file)
+            else:
+                output_path = output_file
+            save_image(y, output_path, prefer16=deep, icc_profile=icc)
+            if output_path.suffix.lower() != os.extsep + "png":
+                eprint(f"Warning: The output file extension is not {os.extsep}png")
         return exit_code
 
     except KeyboardInterrupt:
