@@ -13,6 +13,7 @@ classifiers = [
   "Topic :: Multimedia :: Graphics",
   "Topic :: Scientific/Engineering :: Image Processing",
   "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Typing :: Typed",
 ]
 dynamic = ["version"]
 dependencies = [

@@ -1,3 +1,11 @@
+# Project
+*.jpg
+*.png
+!/images/*.jpg
+!/images/*.png
+!/tests/*.jpg
+!/tests/*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
