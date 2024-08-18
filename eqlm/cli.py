@@ -20,9 +20,14 @@ def main() -> int:
             return "Auto"
 
         @staticmethod
-        def name(input_path: Path | str, *, suffix: str = "-eqlm", ext=f"{os.extsep}png") -> Path:
+        def open_named(input_path: Path | str, *, suffix: str = "-eqlm", ext=f"{os.extsep}png"):
             path = Path(input_path).resolve()
-            return alt_filepath((Path(".") / (path.stem + suffix)).with_suffix(ext))
+            filepath = (Path(".") / (path.stem + suffix)).with_suffix(ext)
+            while True:
+                try:
+                    return open(filepath, "xb"), filepath
+                except FileExistsError:
+                    filepath = alt_filepath(filepath)
 
     class Average:
         def __str__(self) -> str:
@@ -85,10 +90,10 @@ def main() -> int:
                 os.dup2(devnull, sys.stdout.fileno())
         else:
             if isinstance(output_file, Auto):
-                output_path = Auto.name("stdin" if input_file is None else input_file)
+                fp, output_path = Auto.open_named("stdin" if input_file is None else input_file)
             else:
-                output_path = output_file
-            save_image(y, output_path, prefer16=deep, icc_profile=icc)
+                fp = output_path = output_file
+            save_image(y, fp, prefer16=deep, icc_profile=icc)
             if output_path.suffix.lower() != os.extsep + "png":
                 eprint(f"Warning: The output file extension is not {os.extsep}png")
         return exit_code
