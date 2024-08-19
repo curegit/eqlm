@@ -2,7 +2,13 @@
 
 Simple CLI tool to spatially equalize image luminance
 
-## Example
+## Examples
+
+`eqlm images/macaron.jpg -n 3 2 -t 0.8 -c`
+
+| Input | Result |
+|---------|-------------|
+| ![Input Image](images/macaron.jpg)  | ![Output Image](images/macaron-eqlm.png) |
 
 ## Install
 
