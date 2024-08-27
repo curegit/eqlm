@@ -37,7 +37,8 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  -m {luminance,brightness,saturation,lightness}, --mode {luminance,brightness,saturation,lightness}
+  -m {luminance,brightness,saturation,lightness}
+  --mode {luminance,brightness,saturation,lightness}
                         processing mode (default: luminance)
   -n M N, --divide M N  divide image into MxN (Horizontal x Vertical) blocks
                         for aggregation (default: (2, 2))
