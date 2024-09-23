@@ -48,6 +48,7 @@ def main() -> int:
         parser.add_argument("-u", "--unweighted", action="store_true", help="disable weighting based on the alpha channel")
         parser.add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
         parser.add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
+        parser.add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
         parser.add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
         args = parser.parse_args()
 
@@ -62,6 +63,7 @@ def main() -> int:
         unweighted: bool = args.unweighted
         gamma: float | None = args.gamma
         deep: bool = args.depth == 16
+        slow: bool = args.slow
         orientation: bool = not args.no_orientation
 
         x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True, orientation=orientation)
@@ -82,7 +84,7 @@ def main() -> int:
         if output_file is None:
             try:
                 buf = io.BytesIO()
-                save_image(y, buf, prefer16=deep, icc_profile=icc)
+                save_image(y, buf, prefer16=deep, icc_profile=icc, hard=slow)
                 sys.stdout.buffer.write(buf.getbuffer())
             except BrokenPipeError:
                 exit_code = 128 + 13
@@ -93,7 +95,7 @@ def main() -> int:
                 fp, output_path = Auto.open_named("stdin" if input_file is None else input_file)
             else:
                 fp = output_path = output_file
-            save_image(y, fp, prefer16=deep, icc_profile=icc)
+            save_image(y, fp, prefer16=deep, icc_profile=icc, hard=slow)
             if output_path.suffix.lower() != os.extsep + "png":
                 eprint(f"Warning: The output file extension is not {os.extsep}png")
         return exit_code

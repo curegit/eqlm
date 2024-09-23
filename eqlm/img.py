@@ -48,7 +48,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
             raise RuntimeError("Unsupported image")
 
 
-def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16: bool = False, icc_profile: bytes | None = None) -> None:
+def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16: bool = False, icc_profile: bytes | None = None, hard: bool = False) -> None:
     match img.dtype:
         case np.float32:
             if prefer16:
@@ -63,7 +63,7 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16:
             arr = img
         case _:
             raise ValueError()
-    ok, bin = cv2.imencode(".png", arr, [cv2.IMWRITE_PNG_COMPRESSION, 9])
+    ok, bin = cv2.imencode(".png", arr, [cv2.IMWRITE_PNG_COMPRESSION, (9 if hard else 5)])
     if not ok:
         raise RuntimeError("PNG encoding failed")
     buffer = bin.tobytes()

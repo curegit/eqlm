@@ -22,7 +22,7 @@ The main program can be invoked either through the `eqlm` command or through the
 
 ```txt
 usage: eqlm [-h] [-v] [-m {luminance,brightness,saturation,lightness}]
-            [-n M N] [-t RATE] [-c] [-e] [-u] [-g [GAMMA]] [-d {8,16}] [-x]
+            [-n M N] [-t RATE] [-c] [-e] [-u] [-g [GAMMA]] [-d {8,16}] [-s] [-x]
             IN_FILE [OUT_FILE]
 ```
 
@@ -56,6 +56,7 @@ options:
                         [GAMMA=2.2] (default: None)
   -d {8,16}, --depth {8,16}
                         bit depth of the output PNG image (default: 8)
+  -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 ```
 
