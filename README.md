@@ -1,22 +1,22 @@
 # Eqlm
 
-Simple CLI tool to spatially equalize image luminance
+Simple CLI tool to spatially equalize image luminance, lightness, saturation or brightness
 
 ## Examples
 
-`eqlm images/macaron.jpg -n 3 2 -t 0.8 -c`
+### `$ eqlm images/macaron.jpg -n 3 2 -t 0.8 -c`
 
 | Source                             | Result                                   |
 | ---------------------------------- | ---------------------------------------- |
 | ![Input Image](images/macaron.jpg) | ![Output Image](images/macaron-eqlm.png) |
 
-`eqlm images/yaesu-wall.jpg -m lightness -t 0.9 -n 9 6`
+### `$ eqlm images/yaesu-wall.jpg -m lightness -t 0.9 -n 9 6`
 
 | Source                                | Result                                      |
 | ------------------------------------- | ------------------------------------------- |
 | ![Input Image](images/yaesu-wall.jpg) | ![Output Image](images/yaesu-wall-eqlm.png) |
 
-`eqlm images/hakone.jpg -m saturation -t 0.2`
+### `$ eqlm images/hakone.jpg -m saturation -t 0.2`
 
 | Source                            | Result                                  |
 | --------------------------------- | --------------------------------------- |
