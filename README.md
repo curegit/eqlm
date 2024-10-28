@@ -1,6 +1,6 @@
 # Eqlm
 
-Simple CLI tool to spatially equalize image luminance, lightness, saturation or brightness
+Simple CLI tool to spatially equalize image luminance, lightness, saturation, or brightness
 
 ## Examples
 
