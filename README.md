@@ -10,6 +10,18 @@ Simple CLI tool to spatially equalize image luminance
 | ---------------------------------- | ---------------------------------------- |
 | ![Input Image](images/macaron.jpg) | ![Output Image](images/macaron-eqlm.png) |
 
+`eqlm images/yaesu-wall.jpg -m lightness -t 0.9 -n 9 6`
+
+| Source                                | Result                                      |
+| ------------------------------------- | ------------------------------------------- |
+| ![Input Image](images/yaesu-wall.jpg) | ![Output Image](images/yaesu-wall-eqlm.png) |
+
+`eqlm images/hakone.jpg -m saturation -t 0.2`
+
+| Source                            | Result                                  |
+| --------------------------------- | --------------------------------------- |
+| ![Input Image](images/hakone.jpg) | ![Output Image](images/hakone-eqlm.png) |
+
 ## Install
 
 ```sh
