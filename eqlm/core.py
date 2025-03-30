@@ -2,8 +2,7 @@ import numpy as np
 from enum import Enum
 from dataclasses import dataclass
 from numpy import ndarray
-from scipy.interpolate import BSpline
-from scipy.interpolate import CubicSpline
+from scipy.interpolate import CubicSpline, Akima1DInterpolator
 from .img import Color
 from .utils import lerp, chunks, weighted_median
 
@@ -23,23 +22,32 @@ class Mode(Enum):
     Lightness = ColorMode(color=Color.HLS, channel=1)
 
 
+class Interpolation(Enum):
+    Linear = "Linear"
+    Cubic = "CubicSpline"
+    Akima = "AkimaSpline"
+    Makima = "MakimaSpline"
+
+
 modes = {m.name.lower(): m for m in Mode}
+interpolations = {i.name.lower(): i for i in Interpolation}
 
 
-def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: ndarray | None = None, target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
+def biprocess(x: ndarray, n: tuple[int | None, int | None] = (2, 2), *, alpha: ndarray | None = None, interpolation: tuple[Interpolation, Interpolation] = (Interpolation.Linear, Interpolation.Linear), target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     k, l = n
+    ik, il = interpolation
     weights = np.ones_like(x) if alpha is None else alpha
-    z = process(x, weights, l, target=target, median=median, clamp=clamp, clip=clip) if l is not None and l >= 2 else x
-    return process(z.transpose(1, 0), weights.transpose(1, 0), k, target=target, median=median, clamp=clamp, clip=clip).transpose((1, 0)) if k is not None and k >= 2 else z
+    z = process(x, weights, l, interpolation=il, target=target, median=median, clamp=clamp, clip=clip) if l is not None and l >= 2 else x
+    return process(z.transpose(1, 0), weights.transpose(1, 0), k, interpolation=ik, target=target, median=median, clamp=clamp, clip=clip).transpose((1, 0)) if k is not None and k >= 2 else z
 
 
-def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None, use_spline: bool = True) -> ndarray:
+def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation = Interpolation.Linear, target: float | None = None, median: bool = False, clamp: bool = False, clip: tuple[float, float] | None = None) -> ndarray:
     assert n >= 2
     assert x.ndim == w.ndim == 2
     if x.shape[1] < n:
         raise ValueError("Too many divisions")
-    dest = np.zeros_like(x)
-    divs = list(chunks(x.shape[1], n))
+
+
 
     def aggregate(x, w):
         w = w + 1e-8
@@ -47,27 +55,25 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
             return weighted_median(x.ravel(), weights=w.ravel())
         else:
             return np.average(x, weights=w)
+    dest = np.zeros_like(x)
+    divs = list(chunks(x.shape[1], n))
 
-
-    vs = []
-    #for i, ((i1, i2), (_, i3)) in divpairs:
-    #    if i == 0:
-    #        v1 = aggregate(x[:, i1:i2], w[:, i1:i2])
-    #        vs.append(v1)
-    #    v2 = aggregate(x[:, i2:i3], w[:, i2:i3])
-    #    vs.append(v2)
-    for i1, i2 in divs:
-        v = aggregate(x[:, i1:i2], w[:, i1:i2])
-        vs.append(v)
+    vs = [ aggregate(x[:, i1:i2], w[:, i1:i2])  for i1, i2 in divs ]
 
     vt = np.mean(vs) if target is None else lerp(np.min(vs), np.max(vs), target)
 
-    spline = None
-    if use_spline:
-        spline = CubicSpline(np.linspace(0, len(vs) - 1, len(vs)), vs)
+    curve = None
+    x_ = [-0.5 , *np.linspace(0, len(vs) - 1, len(vs)), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
+    v_ = [vs[0], *vs, vs[-1]] if clamp else vs
+    match interpolation:
+        case Interpolation.Cubic:
+            curve = CubicSpline(x_, v_, bc_type="not-a-knot", extrapolate=True)
+        case Interpolation.Akima:
+            curve = Akima1DInterpolator(x_, v_, method="akima", extrapolate=True)
+        case Interpolation.Makima:
+            curve = Akima1DInterpolator(x_, v_, method="makima", extrapolate=True)
 
-    divpairs = list(enumerate(zip(divs[:-1], divs[1:])))
-    for i, ((i1, i2), (_, i3)) in divpairs:
+    for i, ((i1, i2), (_, i3)) in enumerate(zip(divs[:-1], divs[1:])):
         c1 = i1 + (i2 - i1) // 2
         c2 = i2 + (i3 - i2) // 2
         edge1 = i1 == 0
@@ -75,27 +81,22 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, target: float | None = None, 
         k1 = i1 if edge1 else c1
         k2 = i3 if edge2 else c2
 
-        if spline is not None:
-            t1 = float(i) - 0.5 if edge1 else float(i)
-            t2 = float(i + 1) + 0.5 if edge2 else float(i + 1)
-            ts = np.linspace(start=t1, stop=t2, num=(k2 - k1), endpoint=False)
-            ys = spline(ts)
-            print(ts[0], ts[-1])
-            print(ys[0], ys[-1])
-            y = x[:, k1:k2] - ys.reshape((1, k2 - k1)) + vt
-
-
-        else:
+        if curve is None:
             v1 = vs[i]
             v2 = vs[i + 1]
-            ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1)).reshape((1, k2 - k1))
+            ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1), endpoint=False).reshape((1, k2 - k1))
             if clamp:
                 ts = ts.clip(0.0, 1.0)
             grad = lerp(0.0, v1 - v2, ts)
             bias = vt - v1
             y = x[:, k1:k2] + grad.reshape((1, k2 - k1)) + bias
 
-
+        else:
+            t1 = float(i) - 0.5 if edge1 else float(i)
+            t2 = float(i + 1) + 0.5 if edge2 else float(i + 1)
+            ts = np.linspace(start=t1, stop=t2, num=(k2 - k1), endpoint=False)
+            ys = curve(ts)
+            y = x[:, k1:k2] - ys.reshape((1, k2 - k1)) + vt
 
         dest[:, k1:k2] = y if clip is None else y.clip(*clip)
     return dest
