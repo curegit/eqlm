@@ -26,7 +26,7 @@ class Interpolation(Enum):
     Linear = "Linear"
     Cubic = "CubicSpline"
     Akima = "AkimaSpline"
-    Makima = "MakimaSpline"
+    Makima = "ModifiedAkimaSpline"
 
 
 modes = {m.name.lower(): m for m in Mode}
@@ -63,15 +63,16 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
     vt = np.mean(vs) if target is None else lerp(np.min(vs), np.max(vs), target)
 
     curve = None
-    x_ = [-0.5 , *np.linspace(0, len(vs) - 1, len(vs)), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
-    v_ = [vs[0], *vs, vs[-1]] if clamp else vs
+    curve_x = [-0.5 , *map(float, np.linspace(0, len(vs) - 1, len(vs))), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
+    curve_y = [float(vs[0]), *map(float, vs), float(vs[-1])] if clamp else vs
+
     match interpolation:
         case Interpolation.Cubic:
-            curve = CubicSpline(x_, v_, bc_type="not-a-knot", extrapolate=True)
+            curve = CubicSpline(curve_x, curve_y, bc_type="not-a-knot", extrapolate=True)
         case Interpolation.Akima:
-            curve = Akima1DInterpolator(x_, v_, method="akima", extrapolate=True)
+            curve = Akima1DInterpolator(curve_x, curve_y, method="akima", extrapolate=True)
         case Interpolation.Makima:
-            curve = Akima1DInterpolator(x_, v_, method="makima", extrapolate=True)
+            curve = Akima1DInterpolator(curve_x, curve_y, method="makima", extrapolate=True)
 
     for i, ((i1, i2), (_, i3)) in enumerate(zip(divs[:-1], divs[1:])):
         c1 = i1 + (i2 - i1) // 2

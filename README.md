@@ -34,7 +34,8 @@ The main program can be invoked either through the `eqlm` command or through the
 
 ```txt
 usage: eqlm [-h] [-v] [-m {luminance,brightness,saturation,lightness}]
-            [-n M N] [-t RATE] [-c] [-e] [-u] [-g [GAMMA]] [-d {8,16}] [-s] [-x]
+            [-n M N] [-i {linear,cubic,akima,makima}] [-t RATE]
+            [-c] [-e] [-u] [-g [GAMMA]] [-d {8,16}] [-s] [-x]
             IN_FILE [OUT_FILE]
 ```
 
@@ -54,6 +55,10 @@ options:
                         processing mode (default: luminance)
   -n M N, --divide M N  divide image into MxN (Horizontal x Vertical) blocks
                         for aggregation (default: (2, 2))
+  -i {linear,cubic,akima,makima}, --interpolation {linear,cubic,akima,makima}
+                        interpolation method (linear: Linear, cubic: CubicSpline,
+                        akima: AkimaSpline, makima: ModifiedAkimaSpline)
+                        (default: linear)
   -t RATE, --target RATE
                         set the target rate for the output level, ranging from
                         0.0 (minimum) to 1.0 (maximum) (default: Average)
