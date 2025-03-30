@@ -24,7 +24,7 @@ clean:
 	python3 -c 'import os, os.path; os.remove(".coverage") if os.path.isfile(".coverage") else None'
 
 format:
-	python3 -m black -l 300 eqlm tests
+	python3 -m black -l 500 eqlm tests
 
 check:
 	python3 -m mypy eqlm tests
