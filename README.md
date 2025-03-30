@@ -10,6 +10,12 @@ Simple CLI tool to spatially equalize image luminance, lightness, saturation, or
 | ---------------------------------- | ---------------------------------------- |
 | ![Input Image](images/macaron.jpg) | ![Output Image](images/macaron-eqlm.png) |
 
+### `$ eqlm images/mayuno.jpg -n 16 2 -t 0.7 -c -i makima`
+
+| Source                            | Result                                  |
+| --------------------------------- | --------------------------------------- |
+| ![Input Image](images/mayuno.jpg) | ![Output Image](images/mayuno-eqlm.jpg) |
+
 ### `$ eqlm images/yaesu-wall.jpg -m lightness -t 0.9 -n 9 6`
 
 | Source                                | Result                                      |
