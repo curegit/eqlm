@@ -3,7 +3,7 @@ import os
 import io
 from pathlib import Path
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from .core import Mode, biprocess, modes
+from .core import Mode, Interpolation, biprocess, modes, interpolations
 from .img import load_image, save_image, split_alpha, merge_alpha, color_transforms
 from .types import fileinput, fileoutput, choice, uint, positive, rate
 from .utils import alt_filepath
@@ -42,6 +42,7 @@ def main() -> int:
         parser.add_argument("-v", "--version", action="version", version=version)
         parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
         parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN (Horizontal x Vertical) blocks for aggregation")
+        parser.add_argument("-i", "--interpolation", type=choice, choices=list(interpolations.keys()), default=list(interpolations.keys())[0], help=f"interpolation method ({", ".join(f"{k}: {v.value}" for k, v in interpolations.items())})")
         parser.add_argument("-t", "--target", metavar="RATE", type=rate, default=Average(), help="set the target rate for the output level, ranging from 0.0 (minimum) to 1.0 (maximum)")
         parser.add_argument("-c", "--clamp", action="store_true", help="clamp the level values in extrapolated boundaries")
         parser.add_argument("-e", "--median", action="store_true", help="aggregate each block using median instead of mean")
@@ -57,6 +58,7 @@ def main() -> int:
         mode: Mode = modes[args.mode]
         vertical: int | None = args.divide[1] or None
         horizontal: int | None = args.divide[0] or None
+        interpolation: Interpolation = interpolations[args.interpolation]
         target: float | None = None if isinstance(args.target, Average) else args.target
         clamp: bool = args.clamp
         median: bool = args.median
@@ -76,7 +78,7 @@ def main() -> int:
         f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
         a = f(bgr)
         c = mode.value.channel
-        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=(None if unweighted else alpha), target=target, median=median, clamp=clamp, clip=(mode.value.min, mode.value.max))
+        a[c] = biprocess(a[c], n=(vertical, horizontal), alpha=(None if unweighted else alpha), interpolation=(interpolation, interpolation), target=target, median=median, clamp=clamp, clip=(mode.value.min, mode.value.max))
         y = merge_alpha(g(a), alpha)
 
         eprint("Saving ...")
