@@ -1,17 +1,9 @@
 import io
-import os
-import os.path
-import inspect
 import numpy as np
 from unittest import TestCase
 from PIL import Image
 from eqlm import img as eqimg
-
-
-def filerelpath(relpath: str):
-    f = inspect.stack()[1].filename
-    d = os.path.dirname(f)
-    return os.path.join(d, relpath)
+from eqlm.utils import filerelpath
 
 
 class ImageCodecTest(TestCase):
