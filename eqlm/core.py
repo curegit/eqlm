@@ -80,7 +80,7 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
         if curve is None:
             v1 = vs[i]
             v2 = vs[i + 1]
-            ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1), endpoint=False).reshape((1, k2 - k1))
+            ts = np.linspace(start=(-0.5 if edge1 else 0.0), stop=(1.5 if edge2 else 1.0), num=(k2 - k1), endpoint=edge2).reshape((1, k2 - k1))
             if clamp:
                 ts = ts.clip(0.0, 1.0)
             grad = lerp(0.0, v1 - v2, ts)
@@ -89,7 +89,7 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
         else:
             t1 = float(i) - 0.5 if edge1 else float(i)
             t2 = float(i + 1) + 0.5 if edge2 else float(i + 1)
-            ts = np.linspace(start=t1, stop=t2, num=(k2 - k1), endpoint=False)
+            ts = np.linspace(start=t1, stop=t2, num=(k2 - k1), endpoint=edge2)
             ys = curve(ts)
             y = x[:, k1:k2] - ys.reshape((1, k2 - k1)) + vt
         dest[:, k1:k2] = y if clip is None else y.clip(*clip)
