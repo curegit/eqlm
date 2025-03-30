@@ -47,25 +47,21 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
     if x.shape[1] < n:
         raise ValueError("Too many divisions")
 
-
-
     def aggregate(x, w):
         w = w + 1e-8
         if median:
             return weighted_median(x.ravel(), weights=w.ravel())
         else:
             return np.average(x, weights=w)
+
     dest = np.zeros_like(x)
     divs = list(chunks(x.shape[1], n))
-
-    vs = [ aggregate(x[:, i1:i2], w[:, i1:i2])  for i1, i2 in divs ]
-
+    vs = [aggregate(x[:, i1:i2], w[:, i1:i2]) for i1, i2 in divs]
     vt = np.mean(vs) if target is None else lerp(np.min(vs), np.max(vs), target)
 
     curve = None
-    curve_x = [-0.5 , *map(float, np.linspace(0, len(vs) - 1, len(vs))), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
+    curve_x = [-0.5, *map(float, np.linspace(0, len(vs) - 1, len(vs))), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
     curve_y = [float(vs[0]), *map(float, vs), float(vs[-1])] if clamp else vs
-
     match interpolation:
         case Interpolation.Cubic:
             curve = CubicSpline(curve_x, curve_y, bc_type="not-a-knot", extrapolate=True)
@@ -81,7 +77,6 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
         edge2 = i3 == x.shape[1]
         k1 = i1 if edge1 else c1
         k2 = i3 if edge2 else c2
-
         if curve is None:
             v1 = vs[i]
             v2 = vs[i + 1]
@@ -91,13 +86,11 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
             grad = lerp(0.0, v1 - v2, ts)
             bias = vt - v1
             y = x[:, k1:k2] + grad.reshape((1, k2 - k1)) + bias
-
         else:
             t1 = float(i) - 0.5 if edge1 else float(i)
             t2 = float(i + 1) + 0.5 if edge2 else float(i + 1)
             ts = np.linspace(start=t1, stop=t2, num=(k2 - k1), endpoint=False)
             ys = curve(ts)
             y = x[:, k1:k2] - ys.reshape((1, k2 - k1)) + vt
-
         dest[:, k1:k2] = y if clip is None else y.clip(*clip)
     return dest
