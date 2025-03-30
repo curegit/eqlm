@@ -59,7 +59,7 @@ def process(x: ndarray, w: ndarray, n: int = 2, *, interpolation: Interpolation 
     vs = [aggregate(x[:, i1:i2], w[:, i1:i2]) for i1, i2 in divs]
     vt = np.mean(vs) if target is None else lerp(np.min(vs), np.max(vs), target)
 
-    curve = None
+    curve: CubicSpline | Akima1DInterpolator | None = None
     curve_x = [-0.5, *map(float, np.linspace(0, len(vs) - 1, len(vs))), len(vs) - 1 + 0.5] if clamp else np.linspace(0, len(vs) - 1, len(vs))
     curve_y = [float(vs[0]), *map(float, vs), float(vs[-1])] if clamp else vs
     match interpolation:

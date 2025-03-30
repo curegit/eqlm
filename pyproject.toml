@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pip", "setuptools", "build", "twine", "black", "mypy", "coverage"]
+dev = ["pip", "setuptools", "build", "twine", "black", "mypy", "coverage", "scipy-stubs"]
 
 [project.scripts]
 eqlm = "eqlm.cli:main"
