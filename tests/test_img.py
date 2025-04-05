@@ -58,9 +58,10 @@ class ImageChannelTest(TestCase):
                 bgr, alpha = eqimg.split_alpha(bgra)
                 red = bgr[:,:,2]
                 blue = bgr[:,:,0]
-                self.assertTrue(np.allclose(blue, np.zeros(shape=(100, 100))))
-                self.assertTrue(np.allclose(red, np.ones(shape=(100, 100))))
-                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100))))
+                eps = np.finfo(np.float32).eps
+                self.assertTrue(np.allclose(blue, np.zeros(shape=(100, 100)), rtol=eps, atol=eps))
+                self.assertTrue(np.allclose(red, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
+                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
 
     def test_blue(self):
         for orientation in [True, False]:
@@ -69,6 +70,7 @@ class ImageChannelTest(TestCase):
                 bgr, alpha = eqimg.split_alpha(bgra)
                 blue = bgr[:, :, 0]
                 red = bgr[:,:,2]
-                self.assertTrue(np.allclose(red, np.zeros(shape=(100, 100))))
-                self.assertTrue(np.allclose(blue, np.ones(shape=(100, 100))))
-                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100))))
+                eps = np.finfo(np.float32).eps
+                self.assertTrue(np.allclose(red, np.zeros(shape=(100, 100)), rtol=eps, atol=eps))
+                self.assertTrue(np.allclose(blue, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
+                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100)),rtol=eps, atol=eps))
