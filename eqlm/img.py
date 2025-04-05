@@ -26,9 +26,9 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
     if orientation:
-        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_IGNORE_ORIENTATION)
+        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_IGNORE_ORIENTATION ^ cv2.IMREAD_COLOR_RGB)
     else:
-        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED)
+        img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_COLOR_RGB)
     if img.shape[2] not in [3, 4]:
         raise RuntimeError("Only RGB[A] color images supported")
     match img.dtype:
