@@ -48,3 +48,27 @@ class ColorProfileTest(TestCase):
         if isinstance(icc_emb, bytes):
             self.assertGreater(len(icc_emb), 0)
             self.assertEqual(icc, icc_emb)
+
+
+class ImageChannelTest(TestCase):
+    def test_red(self):
+        for orientation in [True, False]:
+            with self.subTest(orientation=orientation):
+                bgra, _ = eqimg.load_image(filerelpath("red32-100.png"), normalize=True, orientation=orientation)
+                bgr, alpha = eqimg.split_alpha(bgra)
+                red = bgr[:,:,2]
+                blue = bgr[:,:,0]
+                self.assertTrue(np.allclose(blue, np.zeros(shape=(100, 100))))
+                self.assertTrue(np.allclose(red, np.ones(shape=(100, 100))))
+                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100))))
+
+    def test_blue(self):
+        for orientation in [True, False]:
+            with self.subTest(orientation=orientation):
+                bgra, _ = eqimg.load_image(filerelpath("blue32-100.png"), normalize=True, orientation=orientation)
+                bgr, alpha = eqimg.split_alpha(bgra)
+                blue = bgr[:, :, 0]
+                red = bgr[:,:,2]
+                self.assertTrue(np.allclose(red, np.zeros(shape=(100, 100))))
+                self.assertTrue(np.allclose(blue, np.ones(shape=(100, 100))))
+                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100))))
