@@ -1,3 +1,4 @@
+import numpy as np
 from itertools import product
 from unittest import TestCase
 from eqlm import core, img as eqimg
@@ -16,3 +17,17 @@ class ProcessTest(TestCase):
                 v[c] = core.biprocess(v[c], n=(vertical, horizontal), interpolation=(interpolation, interpolation), target=target, median=median, clamp=clamp, clip=(mode.value.min, mode.value.max))
                 y = g(v)
                 self.assertEqual(x.shape, y.shape)
+
+
+    def test_identity(self):
+        for orientation in [True, False]:
+            with self.subTest(orientation=orientation):
+                x, _ = eqimg.load_image(filerelpath("tsurumai.webp"), normalize=True, orientation=orientation)
+                mode = core.Mode.Brightness
+                f, g = color_transforms(mode.value.color, transpose=True, gamma=None)
+                v = f(x)
+                c = mode.value.channel
+                v[c] = core.biprocess(v[c], n=(None, None), clip=(mode.value.min, mode.value.max))
+                y = g(v)
+                self.assertEqual(x.shape, y.shape)
+                self.assertTrue(np.allclose(x, y, rtol=0, atol=(1/(2**8-1)/2)))
