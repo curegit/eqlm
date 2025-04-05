@@ -18,7 +18,6 @@ class ProcessTest(TestCase):
                 y = g(v)
                 self.assertEqual(x.shape, y.shape)
 
-
     def test_identity(self):
         for orientation in [True, False]:
             with self.subTest(orientation=orientation):
@@ -30,4 +29,4 @@ class ProcessTest(TestCase):
                 v[c] = core.biprocess(v[c], n=(None, None), clip=(mode.value.min, mode.value.max))
                 y = g(v)
                 self.assertEqual(x.shape, y.shape)
-                self.assertTrue(np.allclose(x, y, rtol=0, atol=(1/(2**8-1)/2)))
+                self.assertTrue(np.allclose(x, y, rtol=0, atol=(1 / (2**8 - 1) / 2)))

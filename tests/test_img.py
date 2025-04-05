@@ -56,8 +56,8 @@ class ImageChannelTest(TestCase):
             with self.subTest(orientation=orientation):
                 bgra, _ = eqimg.load_image(filerelpath("red32-100.png"), normalize=True, orientation=orientation)
                 bgr, alpha = eqimg.split_alpha(bgra)
-                red = bgr[:,:,2]
-                blue = bgr[:,:,0]
+                red = bgr[:, :, 2]
+                blue = bgr[:, :, 0]
                 eps = np.finfo(np.float32).eps
                 self.assertTrue(np.allclose(blue, np.zeros(shape=(100, 100)), rtol=eps, atol=eps))
                 self.assertTrue(np.allclose(red, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
@@ -69,8 +69,8 @@ class ImageChannelTest(TestCase):
                 bgra, _ = eqimg.load_image(filerelpath("blue32-100.png"), normalize=True, orientation=orientation)
                 bgr, alpha = eqimg.split_alpha(bgra)
                 blue = bgr[:, :, 0]
-                red = bgr[:,:,2]
+                red = bgr[:, :, 2]
                 eps = np.finfo(np.float32).eps
                 self.assertTrue(np.allclose(red, np.zeros(shape=(100, 100)), rtol=eps, atol=eps))
                 self.assertTrue(np.allclose(blue, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
-                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100)),rtol=eps, atol=eps))
+                self.assertTrue(np.allclose(alpha, np.ones(shape=(100, 100)), rtol=eps, atol=eps))
