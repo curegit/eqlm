@@ -1,10 +1,13 @@
 # Project
 *.jpg
 *.png
+*.webp
 !/images/*.jpg
 !/images/*.png
+!/images/*.webp
 !/tests/*.jpg
 !/tests/*.png
+!/tests/*.webp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
