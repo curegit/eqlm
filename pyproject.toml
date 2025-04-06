@@ -4,7 +4,8 @@ description = "Simple CLI tool to spatially equalize image luminance"
 keywords = ["image processing", "image manipulation", "brightness", "saturation", "lightness", "luminance"]
 requires-python = ">=3.12"
 readme = "README.md"
-license = {text = "AGPL-3.0"}
+license = "AGPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
 maintainers = [
   {name = "curegit", email = "contact@curegit.jp"}
 ]
@@ -12,7 +13,6 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Multimedia :: Graphics",
   "Topic :: Scientific/Engineering :: Image Processing",
-  "License :: OSI Approved :: GNU Affero General Public License v3",
   "Typing :: Typed",
 ]
 dynamic = ["version"]
@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pip", "setuptools", "build", "twine", "black", "mypy", "coverage", "scipy-stubs"]
+dev = ["pip", "setuptools >= 78", "build", "twine", "black", "mypy", "coverage", "scipy-stubs"]
 
 [project.scripts]
 eqlm = "eqlm.cli:main"
