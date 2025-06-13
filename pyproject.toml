@@ -21,6 +21,7 @@ dependencies = [
   "scipy >= 1.15.0",
   "opencv-python >= 4.11.0",
   "pillow >= 9.3.0",
+  "scikit-image >= 0.25.0",
 ]
 
 [project.optional-dependencies]
