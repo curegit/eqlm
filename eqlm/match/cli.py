@@ -8,7 +8,7 @@ from ..types import Auto
 from ..utils import eprint
 
 
-# TODO: icc matching to reference, treat alpha as a weighting factor
+# TODO: icc matching to reference
 def match(*, source_file: Path | None, reference_file: Path | None, output_file: Path | Auto | None, mode: Mode, gamma: float | None, deep: bool, slow: bool, orientation: bool):
     exit_code = 0
 
@@ -24,7 +24,7 @@ def match(*, source_file: Path | None, reference_file: Path | None, output_file:
     b = f(bgr_ref)
     c = mode.value.channels
 
-    matched = histgram_matching(a, b, c)
+    matched = histgram_matching(a, b, c, x_alpha=alpha, r_alpha=alpha_ref)
 
     y = merge_alpha(g(matched), alpha)
 
