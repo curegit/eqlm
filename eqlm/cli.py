@@ -53,6 +53,8 @@ def main() -> int:
         match_parser.add_argument("reference", metavar="REFERENCE_FILE", type=fileinput, help="reference image file path (use '-' for stdin)")
         match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
         match_parser.add_argument("-m", "--mode", type=choice, choices=list(match_modes.keys()), default=list(match_modes.keys())[0], help="processing mode")
+        match_parser.add_argument("-a", "--alpha", metavar=("SOURCE", "REFERENCE"), type=rate, nargs=2, default=(0.0, 0.5), help="cutout threshold for the alpha channel (source, reference)")
+        match_parser.add_argument("-u", "--unweighted", action="store_true", help="disable cutout based on the alpha channel")
 
         # Shared arguments
         ParserStack(eq_parser, match_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
@@ -85,6 +87,7 @@ def main() -> int:
                     reference_file=args.reference,
                     output_file=args.output,
                     mode=match_modes[args.mode],
+                    alpha=((None, None) if args.unweighted else args.alpha),
                     gamma=args.gamma,
                     deep=(args.depth == 16),
                     slow=args.slow,

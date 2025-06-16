@@ -48,6 +48,10 @@ def histgram_matching(x: ndarray, r: ndarray, channels: list[int], *, x_alpha: n
             r_mask = r_alpha > r_alpha_threshold
         else:
             r_mask = np.ones_like(r_channel, dtype=bool)
+        if x_mask.sum() == 0:
+            raise ValueError("No pixels to match in source channel (all pixels are considered transparent)")
+        if r_mask.sum() == 0:
+            raise ValueError("No pixels to match in reference channel (all pixels are considered transparent)")
         a = x_channel[x_mask].reshape((1, -1))
         b = r_channel[r_mask].reshape((1, -1))
         matched = match_histograms(a, b, channel_axis=None)
