@@ -8,8 +8,8 @@ from ..types import Auto
 from ..utils import eprint
 
 
-# TODO: icc matching to reference, treat alpha as a weighting factor
-def match(*, source_file: Path | None, reference_file: Path | None, output_file: Path | Auto | None, mode: Mode, gamma: float | None, deep: bool, slow: bool, orientation: bool):
+# TODO: icc matching to reference
+def match(*, source_file: Path | None, reference_file: Path | None, output_file: Path | Auto | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None, deep: bool, slow: bool, orientation: bool):
     exit_code = 0
 
     x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if source_file is None else source_file, normalize=True, orientation=orientation)
@@ -17,16 +17,18 @@ def match(*, source_file: Path | None, reference_file: Path | None, output_file:
 
     eprint("Process ...")
 
-    bgr, alpha = split_alpha(x)
+    bgr, alpha_x = split_alpha(x)
     bgr_ref, alpha_ref = split_alpha(r)
     f, g = color_transforms(mode.value.color, gamma=gamma, transpose=True)
     a = f(bgr)
     b = f(bgr_ref)
     c = mode.value.channels
 
-    matched = histgram_matching(a, b, c)
+    alpha_cutout = None if alpha[0] is None else alpha_x
+    alpha_cutout_ref = None if alpha[1] is None else alpha_ref
+    matched = histgram_matching(a, b, c, x_alpha=alpha_cutout, r_alpha=alpha_cutout_ref, x_alpha_threshold=(alpha[0] or 0.0), r_alpha_threshold=(alpha[1] or 0.0))
 
-    y = merge_alpha(g(matched), alpha)
+    y = merge_alpha(g(matched), alpha_x)
 
     eprint("Saving ...")
 
