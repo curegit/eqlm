@@ -10,7 +10,7 @@ from eqlm.utils import filerelpath
 
 class CLITest(TestCase):
     def test_process(self):
-        fpaths = list(map(filerelpath, ["tsurumai.webp", "exif.jpg", "ball.png"]))
+        fpaths = list(map(filerelpath, ["tsurumai.webp", "p3.tiff", "ball.png"]))
         for source_file, reference_file, mode, gamma, alpha in product(fpaths, fpaths, core.Mode, [2.2, None], [(0.0, 0.5), (None, None)]):
             with self.subTest(source_file=source_file, reference_file=reference_file, mode=mode, gamma=gamma):
                 buf = io.BytesIO()
