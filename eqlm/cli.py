@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from .types import fileinput, fileoutput, choice, uint, positive, rate, Auto
+from .types import fileinput, fileoutput, choice, uint, positive, rate, AutoUniquePath
 from .utils import eprint
 from .eq.cli import equalize
 from .eq.core import modes, interpolations
@@ -33,7 +33,7 @@ def main() -> int:
         eq_sub = "eq"
         eq_parser = subparsers.add_parser(eq_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="equalize image luminance")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin)")
-        eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
+        eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
         eq_parser.add_argument("-n", "--divide", metavar=("M", "N"), type=uint, nargs=2, default=(2, 2), help="divide image into MxN (Horizontal x Vertical) blocks for aggregation")
         eq_parser.add_argument("-i", "--interpolation", type=choice, choices=list(interpolations.keys()), default=list(interpolations.keys())[0], help=f"interpolation method ({", ".join(f"{k}: {v.value}" for k, v in interpolations.items())})")
@@ -47,7 +47,7 @@ def main() -> int:
         match_parser = subparsers.add_parser(match_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="match histogram of source image to reference image")
         match_parser.add_argument("source", metavar="SOURCE_FILE", type=fileinput, help="source image file path (use '-' for stdin)")
         match_parser.add_argument("reference", metavar="REFERENCE_FILE", type=fileinput, help="reference image file path (use '-' for stdin)")
-        match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
+        match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout)")
         match_parser.add_argument("-m", "--mode", type=choice, choices=list(match_modes.keys()), default=list(match_modes.keys())[0], help="processing mode")
         match_parser.add_argument("-a", "--alpha", metavar=("SOURCE", "REFERENCE"), type=rate, nargs=2, default=(0.0, 0.5), help="cutout threshold for the alpha channel (source, reference)")
         match_parser.add_argument("-u", "--unweighted", action="store_true", help="disable cutout based on the alpha channel")

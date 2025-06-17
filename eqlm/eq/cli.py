@@ -1,15 +1,17 @@
 import sys
-import os
 import io
+from io import BufferedIOBase
 from pathlib import Path
 from .core import Mode, Interpolation, biprocess
-from ..img import load_image, save_image, split_alpha, merge_alpha, color_transforms
-from ..types import Auto
+from ..img import load_image, split_alpha, merge_alpha, color_transforms
+from ..io import export_png
+from ..types import AutoUniquePath
 from ..utils import eprint
 
 
-def equalize(*, input_file: Path | str | None, output_file: Path | str | Auto | None, mode: Mode, vertical: int | None, horizontal: int | None, interpolation: Interpolation, target: float | None, clamp: bool, median: bool, unweighted: bool, gamma: float | None, deep: bool, slow: bool, orientation: bool) -> int:
+def equalize(*, input_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, vertical: int | None, horizontal: int | None, interpolation: Interpolation, target: float | None, clamp: bool, median: bool, unweighted: bool, gamma: float | None, deep: bool, slow: bool, orientation: bool) -> int:
     exit_code = 0
+
     x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True, orientation=orientation)
 
     eprint(f"Size: {x.shape[1]}x{x.shape[0]}")
@@ -25,21 +27,10 @@ def equalize(*, input_file: Path | str | None, output_file: Path | str | Auto | 
 
     eprint("Saving ...")
 
-    if output_file is None:
-        try:
-            buf = io.BytesIO()
-            save_image(y, buf, prefer16=deep, icc_profile=icc, hard=slow)
-            sys.stdout.buffer.write(buf.getbuffer())
-        except BrokenPipeError:
-            exit_code = 128 + 13
-            devnull = os.open(os.devnull, os.O_WRONLY)
-            os.dup2(devnull, sys.stdout.fileno())
-    else:
-        if isinstance(output_file, Auto):
-            fp, output_path = Auto.open_named("stdin" if input_file is None else input_file)
-        else:
-            fp = output_path = output_file
-        save_image(y, fp, prefer16=deep, icc_profile=icc, hard=slow)
-        if output_path.suffix.lower() != os.extsep + "png":
-            eprint(f"Warning: The output file extension is not {os.extsep}png")
+    if isinstance(output_file, AutoUniquePath):
+        output_file.input_path = "stdin" if input_file is None else "memory" if isinstance(input_file, bytes) else input_file
+        output_file.suffix = f"-eq-{mode.name.lower()}"
+    if (special_code := export_png(y, output_file, deep=deep, slow=slow, icc=icc)) != 0:
+        exit_code = special_code
+
     return exit_code

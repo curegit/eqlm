@@ -67,16 +67,28 @@ def choice(label: str):
     return str.lower(label)
 
 
-class Auto:
+class AutoUniquePath:
     def __str__(self) -> str:
         return "Auto"
 
-    @staticmethod
-    def open_named(input_path: Path | str, *, suffix: str = "-eqlm", ext=f"{os.extsep}png"):
-        path = Path(input_path).resolve()
-        filepath = (Path(".") / (path.stem + suffix)).with_suffix(ext)
+    def __init__(self, *, input_path: Path | str | None = None, suffix: str = ""):
+        self.input_path = input_path
+        self.suffix = suffix
+
+    def open(self, *, input_path: Path | str | None = None, suffix: str | None = None, ext: str = ""):
+        if input_path is None:
+            input_path = self.input_path
+        if input_path is None:
+            raise RuntimeError("Input path is not specified")
+        if suffix is None:
+            suffix = self.suffix
+        path = Path(input_path).resolve(strict=False)
+        filepath = (Path(".") / (path.stem + suffix)).with_suffix(f"{os.extsep}{ext}" if ext else "")
         while True:
             try:
                 return open(filepath, "xb"), filepath
             except FileExistsError:
                 filepath = alt_filepath(filepath)
+
+    def open_png(self, *, input_path: Path | str | None = None, suffix: str | None = None):
+        return self.open(input_path=input_path, suffix=suffix, ext="png")
