@@ -22,8 +22,6 @@ def main(argv: list[str] | None = None) -> int:
         def __str__(self) -> str:
             return "Average"
 
-    exit_code = 0
-
     try:
         parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to spatially equalize image luminance")
         parser.add_argument("-v", "--version", action="version", version=version)
