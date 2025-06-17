@@ -9,7 +9,6 @@ from ..types import AutoUniquePath
 from ..utils import eprint
 
 
-# TODO: icc matching to reference
 def match(*, source_file: Path | str | bytes | None, reference_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
     exit_code = 0
 
@@ -36,7 +35,7 @@ def match(*, source_file: Path | str | bytes | None, reference_file: Path | str 
     if isinstance(output_file, AutoUniquePath):
         output_file.input_path = "stdin" if source_file is None else "memory" if isinstance(source_file, bytes) else source_file
         output_file.suffix = f"-matched-{mode.name.lower()}"
-    if (special_code := export_png(y, output_file, deep=deep, slow=slow, icc=icc)) != 0:
+    if (special_code := export_png(y, output_file, deep=deep, slow=slow, icc=ref_icc)) != 0:
         exit_code = special_code
 
     return exit_code
