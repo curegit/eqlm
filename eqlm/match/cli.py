@@ -35,7 +35,7 @@ def match(*, source_file: Path | str | bytes | None, reference_file: Path | str 
     if isinstance(output_file, AutoUniquePath):
         output_file.input_path = "stdin" if source_file is None else "memory" if isinstance(source_file, bytes) else source_file
         output_file.suffix = f"-matched-{mode.name.lower()}"
-    if (special_code := export_png(y, output_file, deep=deep, slow=slow, icc=ref_icc)) != 0:
-        exit_code = special_code
+    if (return_code := export_png(y, output_file, deep=deep, slow=slow, icc=ref_icc)) != 0:
+        exit_code = return_code
 
     return exit_code

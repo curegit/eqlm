@@ -30,7 +30,7 @@ def equalize(*, input_file: Path | str | bytes | None, output_file: Path | str |
     if isinstance(output_file, AutoUniquePath):
         output_file.input_path = "stdin" if input_file is None else "memory" if isinstance(input_file, bytes) else input_file
         output_file.suffix = f"-eq-{mode.name.lower()}"
-    if (special_code := export_png(y, output_file, deep=deep, slow=slow, icc=icc)) != 0:
-        exit_code = special_code
+    if (return_code := export_png(y, output_file, deep=deep, slow=slow, icc=icc)) != 0:
+        exit_code = return_code
 
     return exit_code
