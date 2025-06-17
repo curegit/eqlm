@@ -2,12 +2,15 @@
 *.jpg
 *.png
 *.webp
+*.tiff
 !/images/*.jpg
 !/images/*.png
 !/images/*.webp
+!/images/*.tiff
 !/tests/*.jpg
 !/tests/*.png
 !/tests/*.webp
+!/tests/*.tiff
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
