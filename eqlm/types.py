@@ -69,7 +69,7 @@ def choice(label: str):
 
 class AutoUniquePath:
     def __str__(self) -> str:
-        return "Auto"
+        return "AutoUnique"
 
     def __init__(self, *, input_path: Path | str | None = None, suffix: str = ""):
         self.input_path = input_path
