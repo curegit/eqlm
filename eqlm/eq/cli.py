@@ -9,7 +9,7 @@ from ..types import AutoUniquePath
 from ..utils import eprint
 
 
-def equalize(*, input_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, vertical: int | None, horizontal: int | None, interpolation: Interpolation, target: float | None, clamp: bool, median: bool, unweighted: bool, gamma: float | None, deep: bool, slow: bool, orientation: bool) -> int:
+def equalize(*, input_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, vertical: int | None = None, horizontal: int | None = None, interpolation: Interpolation = Interpolation.Linear, target: float | None = None, clamp: bool = False, median: bool = False, unweighted: bool = False, gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
     exit_code = 0
 
     x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if input_file is None else input_file, normalize=True, orientation=orientation)

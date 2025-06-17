@@ -10,7 +10,7 @@ from ..utils import eprint
 
 
 # TODO: icc matching to reference
-def match(*, source_file: Path | str | bytes | None, reference_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None, deep: bool, slow: bool, orientation: bool):
+def match(*, source_file: Path | str | bytes | None, reference_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
     exit_code = 0
 
     if source_file is None and reference_file is None:
