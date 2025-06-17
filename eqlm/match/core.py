@@ -28,7 +28,7 @@ class Mode(Enum):
 modes = {m.name.lower(): m for m in Mode}
 
 
-def histgram_matching(x: ndarray, r: ndarray, channels: list[int], *, x_alpha: ndarray | None = None, r_alpha: ndarray | None = None, x_alpha_threshold: float = 0.0, r_alpha_threshold: float = 0.5):
+def histogram_matching(x: ndarray, r: ndarray, channels: list[int], *, x_alpha: ndarray | None = None, r_alpha: ndarray | None = None, x_alpha_threshold: float = 0.0, r_alpha_threshold: float = 0.5):
     assert x.ndim == r.ndim == 3
     assert x_alpha is None or x_alpha.ndim == 2
     assert r_alpha is None or r_alpha.ndim == 2

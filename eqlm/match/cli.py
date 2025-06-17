@@ -2,7 +2,7 @@ import sys
 import io
 from io import BufferedIOBase
 from pathlib import Path
-from .core import Mode, histgram_matching
+from .core import Mode, histogram_matching
 from ..img import load_image, split_alpha, merge_alpha, color_transforms
 from ..io import export_png
 from ..types import AutoUniquePath
@@ -28,7 +28,7 @@ def match(*, source_file: Path | str | bytes | None, reference_file: Path | str 
     c = mode.value.channels
     alpha_cutout = None if alpha[0] is None else alpha_x
     alpha_cutout_ref = None if alpha[1] is None else alpha_ref
-    matched = histgram_matching(a, b, c, x_alpha=alpha_cutout, r_alpha=alpha_cutout_ref, x_alpha_threshold=(alpha[0] or 0.0), r_alpha_threshold=(alpha[1] or 0.0))
+    matched = histogram_matching(a, b, c, x_alpha=alpha_cutout, r_alpha=alpha_cutout_ref, x_alpha_threshold=(alpha[0] or 0.0), r_alpha_threshold=(alpha[1] or 0.0))
     y = merge_alpha(g(matched), alpha_x)
 
     eprint("Saving ...")
