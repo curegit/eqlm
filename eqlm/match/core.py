@@ -10,8 +10,6 @@ from ..img import Color
 class ColorMode:
     color: Color
     channels: list[int]
-    min: float = 0.0
-    max: float = 1.0
 
 
 class Mode(Enum):
@@ -19,9 +17,9 @@ class Mode(Enum):
     Red = ColorMode(color=Color.RGB, channels=[0])
     Green = ColorMode(color=Color.RGB, channels=[1])
     Blue = ColorMode(color=Color.RGB, channels=[2])
-    LAB = ColorMode(color=Color.LAB, channels=[0, 1, 2], min=0.0, max=100.0)
-    AB = ColorMode(color=Color.LAB, channels=[1, 2], min=0.0, max=100.0)
-    Luminance = ColorMode(color=Color.LAB, channels=[0], min=0.0, max=100.0)
+    LAB = ColorMode(color=Color.LAB, channels=[0, 1, 2])
+    AB = ColorMode(color=Color.LAB, channels=[1, 2])
+    Luminance = ColorMode(color=Color.LAB, channels=[0])
     Brightness = ColorMode(color=Color.HSV, channels=[2])
     Saturation = ColorMode(color=Color.HSV, channels=[1])
     Lightness = ColorMode(color=Color.HLS, channels=[1])
