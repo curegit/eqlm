@@ -3,8 +3,8 @@ from enum import Enum
 from dataclasses import dataclass
 from numpy import ndarray
 from scipy.interpolate import CubicSpline, Akima1DInterpolator
-from .img import Color
-from .utils import lerp, chunks, weighted_median
+from ..img import Color
+from ..utils import lerp, chunks, weighted_median
 
 
 @dataclass(frozen=True, kw_only=True)
