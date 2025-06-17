@@ -35,6 +35,6 @@ def export_png(
         else:
             fp = output_path = filelike
         save_image(img, fp, prefer16=deep, icc_profile=icc, hard=slow)
-        if output_path.suffix.lower() != os.extsep + "png":
+        if Path(output_path).suffix.lower() != os.extsep + "png":
             eprint(f"Warning: The output file extension is not {os.extsep}png")
     return exit_code
