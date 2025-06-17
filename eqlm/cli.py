@@ -7,7 +7,7 @@ from .match.cli import match
 from .match.core import modes as match_modes
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     from . import __version__ as version
 
     class ParserStack:
@@ -58,7 +58,7 @@ def main() -> int:
         ParserStack(eq_parser, match_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
         ParserStack(eq_parser, match_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
 
-        args = parser.parse_args()
+        args = parser.parse_args(argv)
         match args.command:
             case command if command == eq_sub:
                 return equalize(
