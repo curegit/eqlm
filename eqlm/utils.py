@@ -1,3 +1,4 @@
+import sys
 import os
 import inspect
 import numpy as np
@@ -33,3 +34,7 @@ def filerelpath(relpath: str) -> str:
     f = inspect.stack()[1].filename
     d = os.path.dirname(f)
     return os.path.join(d, relpath)
+
+
+def eprint(*args, **kwargs):
+    print(*args, **kwargs, file=sys.stderr)

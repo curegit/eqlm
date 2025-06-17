@@ -115,6 +115,7 @@ class Color(Enum):
     HSV = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
     HLS = cv2.COLOR_BGR2HLS, cv2.COLOR_HLS2BGR
     LAB = cv2.COLOR_BGR2Lab, cv2.COLOR_Lab2BGR
+    RGB = cv2.COLOR_BGR2RGB, cv2.COLOR_RGB2BGR
 
 
 def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool = False):

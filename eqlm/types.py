@@ -1,6 +1,8 @@
+import os
 from sys import float_info
 from pathlib import Path
 from math import isfinite
+from .utils import alt_filepath
 
 
 def uint(string: str):
@@ -63,3 +65,18 @@ def fileoutput(string: str):
 
 def choice(label: str):
     return str.lower(label)
+
+
+class Auto:
+    def __str__(self) -> str:
+        return "Auto"
+
+    @staticmethod
+    def open_named(input_path: Path | str, *, suffix: str = "-eqlm", ext=f"{os.extsep}png"):
+        path = Path(input_path).resolve()
+        filepath = (Path(".") / (path.stem + suffix)).with_suffix(ext)
+        while True:
+            try:
+                return open(filepath, "xb"), filepath
+            except FileExistsError:
+                filepath = alt_filepath(filepath)
