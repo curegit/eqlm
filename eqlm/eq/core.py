@@ -16,10 +16,13 @@ class ColorMode:
 
 
 class Mode(Enum):
-    Luminance = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
+    L = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
     Brightness = ColorMode(color=Color.HSV, channel=2)
     Saturation = ColorMode(color=Color.HSV, channel=1)
     Lightness = ColorMode(color=Color.HLS, channel=1)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.value.color.name})"
 
 
 class Interpolation(Enum):

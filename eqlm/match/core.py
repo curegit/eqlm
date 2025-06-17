@@ -19,10 +19,16 @@ class Mode(Enum):
     Blue = ColorMode(color=Color.RGB, channels=[2])
     LAB = ColorMode(color=Color.LAB, channels=[0, 1, 2])
     AB = ColorMode(color=Color.LAB, channels=[1, 2])
-    Luminance = ColorMode(color=Color.LAB, channels=[0])
+    L = ColorMode(color=Color.LAB, channels=[0])
     Brightness = ColorMode(color=Color.HSV, channels=[2])
     Saturation = ColorMode(color=Color.HSV, channels=[1])
     Lightness = ColorMode(color=Color.HLS, channels=[1])
+
+    def __str__(self) -> str:
+        if self.name == self.value.color.name:
+            return self.name
+        else:
+            return f"{self.name} ({self.value.color.name})"
 
 
 modes = {m.name.lower(): m for m in Mode}
