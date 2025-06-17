@@ -29,13 +29,13 @@ def main() -> int:
     exit_code = 0
 
     try:
-        root_parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to spatially equalize image luminance")
-        root_parser.add_argument("-v", "--version", action="version", version=version)
-        subparsers = root_parser.add_subparsers(dest="command", required=True, help="Commands")
+        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to spatially equalize image luminance")
+        parser.add_argument("-v", "--version", action="version", version=version)
+        subparsers = parser.add_subparsers(dest="command", required=True, help="Commands")
 
         # Original eq command
         eq_sub = "eq"
-        eq_parser = subparsers.add_parser(eq_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="equalize image luminance (default, same as root command)")
+        eq_parser = subparsers.add_parser(eq_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="equalize image luminance")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=Auto(), help="output PNG image file path (use '-' for stdout)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(modes.keys()), default=list(modes.keys())[0], help="processing mode")
@@ -62,7 +62,7 @@ def main() -> int:
         ParserStack(eq_parser, match_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
         ParserStack(eq_parser, match_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
 
-        args = root_parser.parse_args()
+        args = parser.parse_args()
         match args.command:
             case command if command == eq_sub:
                 return equalize(
