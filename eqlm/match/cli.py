@@ -12,6 +12,9 @@ from ..utils import eprint
 def match(*, source_file: Path | None, reference_file: Path | None, output_file: Path | Auto | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None, deep: bool, slow: bool, orientation: bool):
     exit_code = 0
 
+    if source_file is None and reference_file is None:
+        raise ValueError("Cannot specify reading from stdin for both source and reference images simultaneously")
+
     x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if source_file is None else source_file, normalize=True, orientation=orientation)
     r, ref_icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if reference_file is None else reference_file, normalize=True, orientation=orientation)
 
