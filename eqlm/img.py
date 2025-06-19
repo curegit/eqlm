@@ -9,6 +9,8 @@ from io import BufferedIOBase
 from numpy import ndarray
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = None
+
 
 def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True, orientation: bool = True) -> tuple[ndarray, bytes | None]:
     match filelike:
