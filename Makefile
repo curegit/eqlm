@@ -1,6 +1,7 @@
 .PHONY: build install devinstall preview publish clean format check test testcov
 
 build: clean
+	php README.md.php > README.md
 	python3 -m build
 
 install:
