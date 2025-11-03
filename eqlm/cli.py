@@ -29,7 +29,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # Original eq command
         eq_sub = "eq"
-        eq_parser = subparsers.add_parser(eq_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="equalize image luminance")
+        eq_parser = subparsers.add_parser(eq_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image luminance", help="equalize image luminance")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(eq_modes.keys()), default=list(eq_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in eq_modes.items())})")
@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # Match command
         match_sub = "match"
-        match_parser = subparsers.add_parser(match_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, help="match histogram of source image to reference image")
+        match_parser = subparsers.add_parser(match_sub, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="match histogram of source image to reference image", help="match histogram of source image to reference image")
         match_parser.add_argument("source", metavar="SOURCE_FILE", type=fileinput, help="source image file path (use '-' for stdin)")
         match_parser.add_argument("reference", metavar="REFERENCE_FILE", type=fileinput, help="reference image file path (use '-' for stdin)")
         match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout)")
