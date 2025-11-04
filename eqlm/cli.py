@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
         subparsers = parser.add_subparsers(dest="command", required=True, help="Commands")
 
         # Original eq command
-        eq_parser = subparsers.add_parser(eq_sub := "eq", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image luminance", help="equalize image luminance")
+        eq_parser = subparsers.add_parser(eq_sub := "eq", aliases=["equalize"], allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image luminance", help="equalize image luminance")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(eq_modes.keys()), default=list(eq_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in eq_modes.items())})")
