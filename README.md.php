@@ -1,6 +1,6 @@
 # Eqlm
 
-CLI tool to manipulate images in various ways
+A CLI tool to manipulate images in various ways
 
 ## Examples
 
