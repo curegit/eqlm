@@ -27,7 +27,7 @@ def chunks(length: int, count: int):
 
 def alt_filepath(filepath: str | Path, *, suffix: str = "+") -> Path:
     path = Path(filepath).resolve()
-    return path if not path.exists() else alt_filepath(path.with_stem(path.stem + suffix), suffix=suffix)
+    return path if not path.exists(follow_symlinks=False) else alt_filepath(path.with_stem(path.stem + suffix), suffix=suffix)
 
 
 def filerelpath(relpath: str) -> str:
