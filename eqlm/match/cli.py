@@ -1,10 +1,8 @@
-import sys
-import io
 from io import BufferedIOBase
 from pathlib import Path
 from .core import Mode, histogram_matching
-from ..img import load_image, split_alpha, merge_alpha, color_transforms
-from ..io import export_png
+from ..img import split_alpha, merge_alpha, color_transforms
+from ..io import import_image, export_png
 from ..types import AutoUniquePath
 from ..utils import eprint
 
@@ -14,8 +12,8 @@ def match(*, source_file: Path | str | bytes | None, reference_file: Path | str 
 
     if source_file is None and reference_file is None:
         raise ValueError("Cannot specify reading from stdin for both source and reference images simultaneously")
-    x, icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if source_file is None else source_file, normalize=True, orientation=orientation)
-    r, ref_icc = load_image(io.BytesIO(sys.stdin.buffer.read()).getbuffer() if reference_file is None else reference_file, normalize=True, orientation=orientation)
+    x, icc = import_image(source_file, normalize=True, orientation=orientation)
+    r, ref_icc = import_image(reference_file, normalize=True, orientation=orientation)
 
     eprint("Process ...")
 

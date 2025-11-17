@@ -39,19 +39,25 @@ def fileinput(string: str):
     # stdin (-) を None で返す
     if string == "-":
         return None
+    # clipboard (_)
+    if string == "_":
+        return Clipboard()
     path = Path(nonempty(string)).resolve(strict=True)
     if path.is_file():
         return path
     else:
-        raise RuntimeError(f"No such file: {path}")
+        raise FileNotFoundError(f"No such file: {path}")
 
 
 def fileoutput(string: str):
     # stdout (-) を None で返す
     if string == "-":
         return None
+    # clipboard (_)
+    if string == "_":
+        return Clipboard()
     path = Path(nonempty(string)).resolve()
-    if path.exists():
+    if path.exists(follow_symlinks=False):
         if path.is_file():
             return path
         else:
@@ -65,6 +71,11 @@ def fileoutput(string: str):
 
 def choice(label: str):
     return str.lower(label)
+
+
+class Clipboard:
+    def __str__(self) -> str:
+        return "Clipboard"
 
 
 class AutoUniquePath:

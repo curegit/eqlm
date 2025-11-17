@@ -25,6 +25,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+clipboard = ["pyside6"]
 dev = ["pip", "build", "twine", "black", "mypy", "coverage", "scipy-stubs"]
 
 [project.scripts]
