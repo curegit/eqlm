@@ -23,12 +23,12 @@ def main(argv: list[str] | None = None) -> int:
             return "Average"
 
     try:
-        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to spatially equalize image luminance")
+        parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to manipulate images in various ways")
         parser.add_argument("-v", "--version", action="version", version=version)
         subparsers = parser.add_subparsers(dest="command", required=True, help="Commands")
 
         # Original eq command
-        eq_parser = subparsers.add_parser(eq_sub := "eq", aliases=["equalize"], allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image luminance", help="equalize image luminance")
+        eq_parser = subparsers.add_parser(eq_sub := "eq", aliases=["equalize"], allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image lightness", help="equalize image lightness")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(eq_modes.keys()), default=list(eq_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in eq_modes.items())})")

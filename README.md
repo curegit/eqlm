@@ -1,6 +1,6 @@
 # Eqlm
 
-CLI tool to manipulate images in various ways
+A CLI tool to manipulate images in various ways
 
 ## Examples
 
@@ -34,6 +34,12 @@ CLI tool to manipulate images in various ways
 pip install eqlm
 ```
 
+### With Clipboard Support
+
+```sh
+pip install eqlm[clipboard]
+```
+
 ## Commands
 
 The main program can be invoked either through the `eqlm` command or through the Python main module option `python3 -m eqlm`.
@@ -41,7 +47,7 @@ Each operation is implemented as a subcommand shown below.
 
 ### Eq
 
-Spatially equalize image luminance, lightness, saturation, or brightness
+Spatially equalize image lightness, saturation, or brightness
 
 ```txt
 usage: eqlm eq [-h] [-m {l,brightness,saturation,lightness}] [-n M N]
@@ -49,12 +55,13 @@ usage: eqlm eq [-h] [-m {l,brightness,saturation,lightness}] [-n M N]
                [-g [GAMMA]] [-d {8,16}] [-s] [-x]
                IN_FILE [OUT_FILE]
 
-equalize image luminance
+equalize image lightness
 
 positional arguments:
-  IN_FILE               input image file path (use '-' for stdin)
-  OUT_FILE              output PNG image file path (use '-' for stdout)
-                        (default: AutoUnique)
+  IN_FILE               input image file path (use '-' for stdin, '_' for
+                        clipboard)
+  OUT_FILE              output PNG image file path (use '-' for stdout, '_'
+                        for clipboard) (default: AutoUnique)
 
 options:
   -h, --help            show this help message and exit
@@ -100,10 +107,12 @@ usage: eqlm match [-h]
 match histogram of source image to reference image
 
 positional arguments:
-  SOURCE_FILE           source image file path (use '-' for stdin)
-  REFERENCE_FILE        reference image file path (use '-' for stdin)
-  OUT_FILE              output PNG image file path (use '-' for stdout)
-                        (default: AutoUnique)
+  SOURCE_FILE           source image file path (use '-' for stdin, '_' for
+                        clipboard)
+  REFERENCE_FILE        reference image file path (use '-' for stdin, '_' for
+                        clipboard)
+  OUT_FILE              output PNG image file path (use '-' for stdout, '_'
+                        for clipboard) (default: AutoUnique)
 
 options:
   -h, --help            show this help message and exit

@@ -34,6 +34,12 @@ A CLI tool to manipulate images in various ways
 pip install eqlm
 ```
 
+### With Clipboard Support
+
+```sh
+pip install eqlm[clipboard]
+```
+
 ## Commands
 
 The main program can be invoked either through the `eqlm` command or through the Python main module option `python3 -m eqlm`.
@@ -41,7 +47,7 @@ Each operation is implemented as a subcommand shown below.
 
 ### Eq
 
-Spatially equalize image luminance, lightness, saturation, or brightness
+Spatially equalize image lightness, saturation, or brightness
 
 ```txt
 <?= shell_exec("python3 -m eqlm eq --help") ?>
