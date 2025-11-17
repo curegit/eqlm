@@ -1,7 +1,7 @@
 [project]
 name = "eqlm"
 description = "A CLI tool to manipulate images in various ways"
-keywords = ["image processing", "image manipulation", "brightness", "saturation", "lightness", "luminance"]
+keywords = ["image processing", "image manipulation", "brightness", "saturation", "lightness"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
