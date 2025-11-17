@@ -25,10 +25,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         parser = ArgumentParser(prog="eqlm", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Simple CLI tool to manipulate images in various ways")
         parser.add_argument("-v", "--version", action="version", version=version)
-        subparsers = parser.add_subparsers(dest="command", required=True, help="Commands")
+        subparsers = parser.add_subparsers(dest="command", required=True, help="command to perform")
 
         # Original eq command
-        eq_parser = subparsers.add_parser(eq_sub := "eq", aliases=["equalize"], allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="equalize image lightness, saturation, or brightness", help="equalize image lightness, saturation, or brightness")
+        eq_parser = subparsers.add_parser(eq_sub := "eq", aliases=["equalize"], allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Equalize image lightness, saturation, or brightness", help="equalize image lightness, saturation, or brightness")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(eq_modes.keys()), default=list(eq_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in eq_modes.items())})")
@@ -40,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
         eq_parser.add_argument("-u", "--unweighted", action="store_true", help="disable weighting based on the alpha channel")
 
         # Match command
-        match_parser = subparsers.add_parser(match_sub := "match", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="match histogram of source image to reference image", help="match histogram of source image to reference image")
+        match_parser = subparsers.add_parser(match_sub := "match", allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, description="Match histogram of source image to reference image", help="match histogram of source image to reference image")
         match_parser.add_argument("source", metavar="SOURCE_FILE", type=fileinput, help="source image file path (use '-' for stdin, '_' for clipboard)")
         match_parser.add_argument("reference", metavar="REFERENCE_FILE", type=fileinput, help="reference image file path (use '-' for stdin, '_' for clipboard)")
         match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")

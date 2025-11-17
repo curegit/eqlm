@@ -55,7 +55,7 @@ usage: eqlm eq [-h] [-m {l,brightness,saturation,lightness}] [-n M N]
                [-g [GAMMA]] [-d {8,16}] [-s] [-x]
                IN_FILE [OUT_FILE]
 
-equalize image lightness
+Equalize image lightness, saturation, or brightness
 
 positional arguments:
   IN_FILE               input image file path (use '-' for stdin, '_' for
@@ -104,7 +104,7 @@ usage: eqlm match [-h]
                   [-x]
                   SOURCE_FILE REFERENCE_FILE [OUT_FILE]
 
-match histogram of source image to reference image
+Match histogram of source image to reference image
 
 positional arguments:
   SOURCE_FILE           source image file path (use '-' for stdin, '_' for
