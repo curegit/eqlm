@@ -1,6 +1,8 @@
 recursive-include images/ *.jpg
 recursive-include images/ *.png
 recursive-include images/ *.webp
+recursive-include images/ *.tiff
 recursive-include tests/ *.jpg
 recursive-include tests/ *.png
 recursive-include tests/ *.webp
+recursive-include tests/ *.tiff

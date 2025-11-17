@@ -33,21 +33,27 @@ class ExifTest(TestCase):
 
 class ColorProfileTest(TestCase):
     def test_read_icc(self):
-        _, icc = eqimg.load_image(filerelpath("icc.png"), normalize=True)
-        self.assertIsInstance(icc, bytes)
-        if isinstance(icc, bytes):
-            self.assertGreater(len(icc), 0)
+        fpaths = list(map(filerelpath, ["icc.png", "p3.tiff"]))
+        for fpath in fpaths:
+            with self.subTest(fpath=fpath):
+                _, icc = eqimg.load_image(fpath, normalize=True)
+                self.assertIsInstance(icc, bytes)
+                if isinstance(icc, bytes):
+                    self.assertGreater(len(icc), 0)
 
     def test_embed_icc(self):
-        i, icc = eqimg.load_image(filerelpath("icc.png"), normalize=True)
-        buf = io.BytesIO()
-        eqimg.save_image(i, buf, icc_profile=icc)
-        png = buf.getvalue()
-        _, icc_emb = eqimg.load_image(png)
-        self.assertIsInstance(icc_emb, bytes)
-        if isinstance(icc_emb, bytes):
-            self.assertGreater(len(icc_emb), 0)
-            self.assertEqual(icc, icc_emb)
+        fpaths = list(map(filerelpath, ["icc.png", "p3.tiff"]))
+        for fpath in fpaths:
+            with self.subTest(fpath=fpath):
+                i, icc = eqimg.load_image(fpath, normalize=True)
+                buf = io.BytesIO()
+                eqimg.save_image(i, buf, icc_profile=icc)
+                png = buf.getvalue()
+                _, icc_emb = eqimg.load_image(png)
+                self.assertIsInstance(icc_emb, bytes)
+                if isinstance(icc_emb, bytes):
+                    self.assertGreater(len(icc_emb), 0)
+                    self.assertEqual(icc, icc_emb)
 
 
 class ImageChannelTest(TestCase):

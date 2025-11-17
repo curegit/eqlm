@@ -1,3 +1,4 @@
+import sys
 import os
 import inspect
 import numpy as np
@@ -26,10 +27,14 @@ def chunks(length: int, count: int):
 
 def alt_filepath(filepath: str | Path, *, suffix: str = "+") -> Path:
     path = Path(filepath).resolve()
-    return path if not path.exists() else alt_filepath(path.with_stem(path.stem + suffix), suffix=suffix)
+    return path if not path.exists(follow_symlinks=False) else alt_filepath(path.with_stem(path.stem + suffix), suffix=suffix)
 
 
 def filerelpath(relpath: str) -> str:
     f = inspect.stack()[1].filename
     d = os.path.dirname(f)
     return os.path.join(d, relpath)
+
+
+def eprint(*args, **kwargs):
+    print(*args, **kwargs, file=sys.stderr)

@@ -9,6 +9,8 @@ from io import BufferedIOBase
 from numpy import ndarray
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = None
+
 
 def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = True, orientation: bool = True) -> tuple[ndarray, bytes | None]:
     match filelike:
@@ -18,7 +20,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
         case bytes() | memoryview() as buffer:
             pass
         case _:
-            raise ValueError()
+            raise TypeError()
     try:
         icc = extract_icc(buffer)
     except Exception:
@@ -30,7 +32,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
     else:
         img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_COLOR_RGB)
     if img.shape[2] not in [3, 4]:
-        raise RuntimeError("Only RGB[A] color images supported")
+        raise TypeError("Only RGB[A] color images supported")
     match img.dtype:
         case np.uint8:
             if normalize:
@@ -45,7 +47,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
         case np.float32:
             return img, icc
         case _:
-            raise RuntimeError("Unsupported image")
+            raise TypeError("Unsupported image")
 
 
 def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16: bool = False, icc_profile: bytes | None = None, hard: bool = False) -> None:
@@ -62,7 +64,7 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16:
         case np.uint8 | np.uint16:
             arr = img
         case _:
-            raise ValueError()
+            raise TypeError()
     ok, bin = cv2.imencode(".png", arr, [cv2.IMWRITE_PNG_COMPRESSION, (9 if hard else 5)])
     if not ok:
         raise RuntimeError("PNG encoding failed")
@@ -76,7 +78,7 @@ def save_image(img: ndarray, filelike: str | Path | BufferedIOBase, *, prefer16:
         case BufferedIOBase() as stream:
             stream.write(buffer)
         case _:
-            raise ValueError()
+            raise TypeError()
 
 
 def extract_icc(img_bytes: bytes | memoryview) -> bytes | None:
@@ -115,6 +117,7 @@ class Color(Enum):
     HSV = cv2.COLOR_BGR2HSV, cv2.COLOR_HSV2BGR
     HLS = cv2.COLOR_BGR2HLS, cv2.COLOR_HLS2BGR
     LAB = cv2.COLOR_BGR2Lab, cv2.COLOR_Lab2BGR
+    RGB = cv2.COLOR_BGR2RGB, cv2.COLOR_RGB2BGR
 
 
 def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool = False):
@@ -136,7 +139,7 @@ def split_alpha(x: ndarray) -> tuple[ndarray, ndarray | None]:
         return x[:, :, :3], x[:, :, 3]
     elif x.shape[2] == 3:
         return x, None
-    raise ValueError()
+    raise TypeError()
 
 
 def merge_alpha(x: ndarray, a: ndarray | None = None) -> ndarray:

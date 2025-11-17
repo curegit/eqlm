@@ -3,8 +3,8 @@ from enum import Enum
 from dataclasses import dataclass
 from numpy import ndarray
 from scipy.interpolate import CubicSpline, Akima1DInterpolator
-from .img import Color
-from .utils import lerp, chunks, weighted_median
+from ..img import Color
+from ..utils import lerp, chunks, weighted_median
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -16,10 +16,13 @@ class ColorMode:
 
 
 class Mode(Enum):
-    Luminance = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
+    L = ColorMode(color=Color.LAB, channel=0, min=0.0, max=100.0)
     Brightness = ColorMode(color=Color.HSV, channel=2)
     Saturation = ColorMode(color=Color.HSV, channel=1)
     Lightness = ColorMode(color=Color.HLS, channel=1)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.value.color.name})"
 
 
 class Interpolation(Enum):
