@@ -91,6 +91,9 @@ options:
                         bit depth of the output PNG image (default: 8)
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
+
+A '--' is usable to terminate option parsing so remaining arguments are
+treated as positional arguments.
 ```
 
 ### Match
@@ -134,6 +137,9 @@ options:
                         bit depth of the output PNG image (default: 8)
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
+
+A '--' is usable to terminate option parsing so remaining arguments are
+treated as positional arguments.
 ```
 
 ## License
