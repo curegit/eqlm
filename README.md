@@ -2,6 +2,18 @@
 
 A CLI tool to manipulate images in various ways
 
+## Installation
+
+```sh
+pip install eqlm
+```
+
+### With Clipboard Support
+
+```sh
+pip install eqlm[clipboard]
+```
+
 ## Examples
 
 ### `$ eqlm eq images/macaron.jpg -n 3 2 -t 0.8 -c`
@@ -27,18 +39,6 @@ A CLI tool to manipulate images in various ways
 | Source                            | Result                                  |
 | --------------------------------- | --------------------------------------- |
 | ![Input Image](images/hakone.jpg) | ![Output Image](images/hakone-eqlm.jpg) |
-
-## Installation
-
-```sh
-pip install eqlm
-```
-
-### With Clipboard Support
-
-```sh
-pip install eqlm[clipboard]
-```
 
 ## Commands
 
