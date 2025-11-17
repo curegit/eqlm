@@ -39,8 +39,8 @@ repository = "https://github.com/curegit/eqlm.git"
 requires = ["setuptools >= 78"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["eqlm"]
+[tool.setuptools.packages.find]
+include = ["eqlm*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "eqlm.__version__"}
