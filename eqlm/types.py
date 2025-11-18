@@ -32,6 +32,7 @@ def positive(string: str):
         return value
     raise ValueError()
 
+
 def rate(string: str):
     value = float(string)
     if 0 <= value <= 1:

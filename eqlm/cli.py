@@ -8,6 +8,7 @@ from .match.core import modes as match_modes
 from .laps.cli import laps
 from .laps.core import NamedStencil, stencils, modes as laps_modes
 
+
 def main(argv: list[str] | None = None) -> int:
     from . import __version__ as version
 
