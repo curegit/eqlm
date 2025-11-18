@@ -1,7 +1,12 @@
+import io
 import itertools
 import numpy as np
+from itertools import product
+from contextlib import redirect_stderr
 from unittest import TestCase
+from eqlm.laps import core, cli
 from eqlm.laps.core import NamedStencil, sharpening_kernel
+from eqlm.utils import filerelpath
 
 class KernelTest(TestCase):
     def test_simple5(self):
@@ -22,3 +27,19 @@ class KernelTest(TestCase):
                 k = sharpening_kernel(s.value, coef=c)
                 self.assertTrue( np.allclose( k.sum(), 1.0))
 
+class CLITest(TestCase):
+    def test_process(self):
+        fpaths = list(map(filerelpath, ["tsurumai.webp", "p3.tiff", "ball.png"]))
+        for input_file,  mode, stencil,include_alpha, gamma in product(fpaths, core.Mode, core.stencils.values(),[True, False], [2.2, None]):
+            with self.subTest(input_file=input_file,  mode=mode, stencil=stencil, include_alpha=include_alpha, gamma=gamma):
+                buf = io.BytesIO()
+                with redirect_stderr(io.StringIO()):
+                    cli.laps(
+                        input_file=input_file,
+                        output_file=buf,
+                        mode=mode,
+                        stencil=stencil,
+                        include_alpha=include_alpha,
+                        gamma=gamma,
+                    )
+                self.assertTrue(buf.getvalue())
