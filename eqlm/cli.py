@@ -50,8 +50,9 @@ def main(argv: list[str] | None = None) -> int:
         match_parser.add_argument("reference", metavar="REFERENCE_FILE", type=fileinput, help="reference image file path (use '-' for stdin, '_' for clipboard)")
         match_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
         match_parser.add_argument("-m", "--mode", type=choice, choices=list(match_modes.keys()), default=list(match_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in match_modes.items())})")
-        match_parser.add_argument("-a", "--alpha", metavar=("SOURCE", "REFERENCE"), type=rate, nargs=2, default=(0.0, 0.5), help="cutout threshold for the alpha channel (source, reference)")
-        match_parser.add_argument("-u", "--unweighted", action="store_true", help="disable cutout based on the alpha channel")
+        group = match_parser.add_mutually_exclusive_group()
+        group.add_argument("-a", "--alpha", metavar=("SOURCE", "REFERENCE"), type=rate, nargs=2, default=(0.0, 0.5), help="cutout threshold for the alpha channel (source, reference)")
+        group.add_argument("-u", "--unweighted", action="store_true", help="disable cutout based on the alpha channel")
 
         # Laps command
         laps_parser = create_subparser(laps_sub := "laps", description="Sharpen an image using a Laplacian variant kernel", help="sharpen an image using a Laplacian variant kernel")
