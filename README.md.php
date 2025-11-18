@@ -63,6 +63,14 @@ Match histogram of source image to reference image
 <?= shell_exec("python3 -m eqlm match --help") ?>
 ```
 
+### Laps
+
+Sharpen an image using a Laplacian variant kernel
+
+```txt
+<?= shell_exec("python3 -m eqlm laps --help") ?>
+```
+
 ## License
 
 GNU Affero General Public License v3.0 or later
