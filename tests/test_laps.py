@@ -9,14 +9,14 @@ from eqlm.laps.core import NamedStencil, sharpening_kernel
 from eqlm.utils import filerelpath
 
 class KernelTest(TestCase):
-    def test_simple5(self):
-        self.assertTrue(np.all(NamedStencil.Simple5.value.array ==
+    def test_basic5(self):
+        self.assertTrue(np.all(NamedStencil.Basic5.value.array ==
             np.array(
           [[0,-1,0],[-1,4,-1],[0,-1,0]],
           dtype=np.float32,)
                                ))
-    def test_simple9(self):
-        self.assertTrue(np.allclose(NamedStencil.Simple9.value.array, np.array([[-1,  -1, -1],
+    def test_basic9(self):
+        self.assertTrue(np.allclose(NamedStencil.Basic9.value.array, np.array([[-1,  -1, -1],
            [-1, 8, -1],
            [-1,  -1, -1]], dtype=float) / 3) )
 
