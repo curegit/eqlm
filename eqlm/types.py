@@ -12,13 +12,25 @@ def uint(string: str):
     raise ValueError()
 
 
-def positive(string: str):
+def real(string: str):
     value = float(string)
-    if isfinite(value) and value >= float_info.epsilon:
+    if isfinite(value):
         return value
-    else:
-        raise ValueError()
+    raise ValueError()
 
+
+def ufloat(string: str):
+    value = real(string)
+    if value >= 0:
+        return value
+    raise ValueError()
+
+
+def positive(string: str):
+    value = real(string)
+    if value >= float_info.epsilon:
+        return value
+    raise ValueError()
 
 def rate(string: str):
     value = float(string)

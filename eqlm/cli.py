@@ -1,11 +1,12 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from .types import fileinput, fileoutput, choice, uint, positive, rate, AutoUniquePath
+from .types import fileinput, fileoutput, choice, uint, positive, ufloat, rate, AutoUniquePath
 from .utils import eprint
 from .eq.cli import equalize
 from .eq.core import modes as eq_modes, interpolations
 from .match.cli import match
 from .match.core import modes as match_modes
-
+from .laps.cli import laps
+from .laps.core import NamedStencil, stencils
 
 def main(argv: list[str] | None = None) -> int:
     from . import __version__ as version
@@ -51,11 +52,19 @@ def main(argv: list[str] | None = None) -> int:
         match_parser.add_argument("-a", "--alpha", metavar=("SOURCE", "REFERENCE"), type=rate, nargs=2, default=(0.0, 0.5), help="cutout threshold for the alpha channel (source, reference)")
         match_parser.add_argument("-u", "--unweighted", action="store_true", help="disable cutout based on the alpha channel")
 
+        # Laps command
+        laps_parser = create_subparser(laps_sub := "laps", description="", help="")
+        laps_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
+        laps_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
+        laps_parser.add_argument("-m", "--stencil", type=choice, choices=list(stencils.keys()), default=next(k for k, v in stencils.items() if v == NamedStencil.OonoPuri), help=f"stencil mode ({", ".join(f'{k}: {v}' for k, v in stencils.items())})")
+        laps_parser.add_argument("-c", "--coef", metavar="C", type=ufloat, default=1.0, help="")
+        laps_parser.add_argument("-a", "--include-alpha", action="store_true", help="also sharpen the alpha channel")
+
         # Shared arguments
-        ParserStack(eq_parser, match_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before process [GAMMA=2.2]")
-        ParserStack(eq_parser, match_parser).add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
-        ParserStack(eq_parser, match_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
-        ParserStack(eq_parser, match_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
+        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before the process [GAMMA=2.2]")
+        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
+        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
+        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
 
         args = parser.parse_args(argv)
         match args.command:
@@ -83,6 +92,18 @@ def main(argv: list[str] | None = None) -> int:
                     output_file=args.output,
                     mode=match_modes[args.mode],
                     alpha=((None, None) if args.unweighted else args.alpha),
+                    gamma=args.gamma,
+                    deep=(args.depth == 16),
+                    slow=args.slow,
+                    orientation=(not args.no_orientation),
+                )
+            case str() as command if command == laps_sub:
+                return laps(
+                    input_file=args.input,
+                    output_file=args.output,
+                    stencil=stencils[args.stencil],
+                    coef=args.coef,
+                    include_alpha=args.include_alpha,
                     gamma=args.gamma,
                     deep=(args.depth == 16),
                     slow=args.slow,
