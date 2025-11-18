@@ -6,7 +6,7 @@ from .eq.core import modes as eq_modes, interpolations
 from .match.cli import match
 from .match.core import modes as match_modes
 from .laps.cli import laps
-from .laps.core import NamedStencil, stencils
+from .laps.core import NamedStencil, stencils, modes as laps_modes
 
 def main(argv: list[str] | None = None) -> int:
     from . import __version__ as version
@@ -56,7 +56,8 @@ def main(argv: list[str] | None = None) -> int:
         laps_parser = create_subparser(laps_sub := "laps", description="", help="")
         laps_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         laps_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
-        laps_parser.add_argument("-m", "--stencil", type=choice, choices=list(stencils.keys()), default=next(k for k, v in stencils.items() if v == NamedStencil.OonoPuri), help=f"stencil mode ({", ".join(f'{k}: {v}' for k, v in stencils.items())})")
+        laps_parser.add_argument("-m", "--mode", type=choice, choices=list(laps_modes.keys()), default=list(laps_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in laps_modes.items())})")
+        laps_parser.add_argument("-t", "--stencil", type=choice, choices=list(stencils.keys()), default=next(k for k, v in stencils.items() if v == NamedStencil.OonoPuri), help=f"stencil mode ({", ".join(f'{k}: {v}' for k, v in stencils.items())})")
         laps_parser.add_argument("-c", "--coef", metavar="C", type=ufloat, default=1.0, help="")
         laps_parser.add_argument("-a", "--include-alpha", action="store_true", help="also sharpen the alpha channel")
 
@@ -101,6 +102,7 @@ def main(argv: list[str] | None = None) -> int:
                 return laps(
                     input_file=args.input,
                     output_file=args.output,
+                    mode=laps_modes[args.mode],
                     stencil=stencils[args.stencil],
                     coef=args.coef,
                     include_alpha=args.include_alpha,

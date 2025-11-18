@@ -4,9 +4,32 @@ import numpy as np
 from enum import Enum
 from dataclasses import dataclass
 from numpy import ndarray
+from ..img import Color
+
+@dataclass(frozen=True, kw_only=True)
+class ColorMode:
+    color: Color
+    channels: list[int]
+    min: list[float] | float = 0.0
+    max: list[float] | float = 1.0
+
+class Mode(Enum):
+    RGB = ColorMode(color=Color.RGB, channels=[0, 1, 2])
+    Red = ColorMode(color=Color.RGB, channels=[0])
+    Green = ColorMode(color=Color.RGB, channels=[1])
+    Blue = ColorMode(color=Color.RGB, channels=[2])
+    LAB = ColorMode(color=Color.LAB, channels=[0, 1, 2], min=[0.0, -127.0, -127.0], max=[100.0, 127.0, 127.0])
+    AB = ColorMode(color=Color.LAB, channels=[1, 2], min=-127.0, max=127.0)
+    L = ColorMode(color=Color.LAB, channels=[0], min=0.0, max=100.0)
+
+    def __str__(self) -> str:
+        if self.name == self.value.color.name:
+            return self.name
+        else:
+            return f"{self.name} ({self.value.color.name})"
 
 
-@dataclass( kw_only=True)
+@dataclass(kw_only=True, slots=True)
 class NinePointStencil:
     array: ndarray
     gamma: float
@@ -43,6 +66,10 @@ class NamedStencil(Enum):
      OonoPuri = NinePointStencil(gamma=(1/2))
      PatraKarttunen = NinePointStencil(gamma=(1/3))
 
+     def __str__(self) -> str:
+        return self.name
+
+modes = {m.name.lower(): m for m in Mode}
 stencils = {s.name.lower(): s for s in NamedStencil}
 
 
@@ -55,7 +82,15 @@ def sharpening_kernel(stencil: NinePointStencil, *, coef:float=1.0):
      return  identity + (coef * stencil.array).astype(np.float32)
 
 
-def laplacian_sharpening(x: ndarray, stencil: NinePointStencil, *,coef:float=1.0, clip: tuple[float, float] | None = None):
+def laplacian_sharpening(x: ndarray, stencil: NinePointStencil,channels: list[int], *,coef:float=1.0, clip: tuple[float, float] | list[tuple[float, float]]  | None = None):
     kernel = sharpening_kernel(stencil=stencil, coef=coef)
-    result = cv2.filter2D(x, -1, kernel, borderType=cv2.BORDER_REFLECT)
-    return result if clip is None else result.clip(*clip)
+    result = x.copy()
+    h = x[:,:, channels]
+    result[:,:,channels] = cv2.filter2D(h, -1, kernel, borderType=cv2.BORDER_REFLECT).reshape(h.shape)
+    if clip is not None:
+        if isinstance(clip, tuple):
+            result = result.clip(*clip)
+        else:
+            for i, bound in zip(range(result.shape[2]), clip):
+                result[:, :, i] = result[:, :, i].clip(*bound)
+    return result
