@@ -14,6 +14,8 @@ pip install eqlm
 pip install eqlm[clipboard]
 ```
 
+Note that the clipboard functionality depends heavily on the OS you are using.
+
 ## Examples
 
 ### `$ eqlm eq images/macaron.jpg -n 3 2 -t 0.8 -c`
