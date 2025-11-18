@@ -7,7 +7,7 @@ from ..types import AutoUniquePath
 from ..utils import eprint
 
 
-def laps(*, input_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode,stencil: NamedStencil,  coef: float = 1.0, include_alpha: bool = False, gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
+def laps(*, input_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode,stencil: NamedStencil,  coef: float = 0.2, include_alpha: bool = False, gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
     exit_code = 0
 
     x, icc = import_image(input_file, normalize=True, orientation=orientation)

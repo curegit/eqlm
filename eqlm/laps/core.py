@@ -60,8 +60,8 @@ class NinePointStencil:
 
 
 class NamedStencil(Enum):
-     Simple5 = NinePointStencil(gamma=0.0)
-     Simple9 = NinePointStencil(gamma=(2/3))
+     Basic5 = NinePointStencil(gamma=0.0)
+     Basic9 = NinePointStencil(gamma=(2/3))
      Diagonal = NinePointStencil(gamma=1.0)
      OonoPuri = NinePointStencil(gamma=(1/2))
      PatraKarttunen = NinePointStencil(gamma=(1/3))
@@ -82,7 +82,7 @@ def sharpening_kernel(stencil: NinePointStencil, *, coef:float=1.0):
      return  identity + (coef * stencil.array).astype(np.float32)
 
 
-def laplacian_sharpening(x: ndarray, stencil: NinePointStencil,channels: list[int], *,coef:float=1.0, clip: tuple[float, float] | list[tuple[float, float]]  | None = None):
+def laplacian_sharpening(x: ndarray, stencil: NinePointStencil,channels: list[int], *,coef:float=0.2, clip: tuple[float, float] | list[tuple[float, float]]  | None = None):
     kernel = sharpening_kernel(stencil=stencil, coef=coef)
     result = x.copy()
     h = x[:,:, channels]
