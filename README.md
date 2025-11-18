@@ -14,6 +14,8 @@ pip install eqlm
 pip install eqlm[clipboard]
 ```
 
+Note that the clipboard functionality depends heavily on the OS you are using.
+
 ## Examples
 
 ### `$ eqlm eq images/macaron.jpg -n 3 2 -t 0.8 -c`
@@ -85,7 +87,7 @@ options:
   -u, --unweighted      disable weighting based on the alpha channel (default:
                         False)
   -g [GAMMA], --gamma [GAMMA]
-                        apply inverse gamma correction before process
+                        apply inverse gamma correction before the process
                         [GAMMA=2.2] (default: None)
   -d {8,16}, --depth {8,16}
                         bit depth of the output PNG image (default: 8)
@@ -103,7 +105,7 @@ Match histogram of source image to reference image
 ```txt
 usage: eqlm match [-h]
                   [-m {rgb,red,green,blue,lab,ab,l,brightness,saturation,lightness}]
-                  [-a SOURCE REFERENCE] [-u] [-g [GAMMA]] [-d {8,16}] [-s]
+                  [-a SOURCE REFERENCE | -u] [-g [GAMMA]] [-d {8,16}] [-s]
                   [-x]
                   SOURCE_FILE REFERENCE_FILE [OUT_FILE]
 
@@ -131,7 +133,49 @@ options:
   -u, --unweighted      disable cutout based on the alpha channel (default:
                         False)
   -g [GAMMA], --gamma [GAMMA]
-                        apply inverse gamma correction before process
+                        apply inverse gamma correction before the process
+                        [GAMMA=2.2] (default: None)
+  -d {8,16}, --depth {8,16}
+                        bit depth of the output PNG image (default: 8)
+  -s, --slow            use the highest PNG compression level (default: False)
+  -x, --no-orientation  ignore the Exif orientation metadata (default: False)
+
+A '--' is usable to terminate option parsing so remaining arguments are
+treated as positional arguments.
+```
+
+### Laps
+
+Sharpen an image using a Laplacian variant kernel
+
+```txt
+usage: eqlm laps [-h] [-m {rgb,red,green,blue,lab,ab,l}]
+                 [-t {basic5,basic9,diagonal,oonopuri,patrakarttunen}] [-c C]
+                 [-a] [-g [GAMMA]] [-d {8,16}] [-s] [-x]
+                 IN_FILE [OUT_FILE]
+
+Sharpen an image using a Laplacian variant kernel
+
+positional arguments:
+  IN_FILE               input image file path (use '-' for stdin, '_' for
+                        clipboard)
+  OUT_FILE              output PNG image file path (use '-' for stdout, '_'
+                        for clipboard) (default: AutoUnique)
+
+options:
+  -h, --help            show this help message and exit
+  -m {rgb,red,green,blue,lab,ab,l}, --mode {rgb,red,green,blue,lab,ab,l}
+                        processing channel mode (rgb: RGB, red: Red (RGB),
+                        green: Green (RGB), blue: Blue (RGB), lab: LAB, ab: AB
+                        (LAB), l: L (LAB)) (default: rgb)
+  -t {basic5,basic9,diagonal,oonopuri,patrakarttunen}, --stencil {basic5,basic9,diagonal,oonopuri,patrakarttunen}
+                        kernel selection (basic5: Basic5, basic9: Basic9,
+                        diagonal: Diagonal, oonopuri: OonoPuri,
+                        patrakarttunen: PatraKarttunen) (default: oonopuri)
+  -c C, --coef C        sharpening factor (default: 0.2)
+  -a, --include-alpha   also sharpen the alpha channel (default: False)
+  -g [GAMMA], --gamma [GAMMA]
+                        apply inverse gamma correction before the process
                         [GAMMA=2.2] (default: None)
   -d {8,16}, --depth {8,16}
                         bit depth of the output PNG image (default: 8)
