@@ -12,6 +12,8 @@ def laps(*, input_file: Path | str | bytes | None, output_file: Path | str | Aut
 
     x, icc = import_image(input_file, normalize=True, orientation=orientation)
 
+    eprint("Process ...")
+
     bgr, alpha = split_alpha(x)
     f, g = color_transforms(mode.value.color, gamma=gamma, transpose=False)
     a = f(bgr)
