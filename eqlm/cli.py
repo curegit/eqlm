@@ -59,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
         laps_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         laps_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
         laps_parser.add_argument("-m", "--mode", type=choice, choices=list(laps_modes.keys()), default=list(laps_modes.keys())[0], help=f"processing channel mode ({", ".join(f'{k}: {v}' for k, v in laps_modes.items())})")
-        laps_parser.add_argument("-t", "--stencil", type=choice, choices=list(stencils.keys()), default=next(k for k, v in stencils.items() if v == NamedStencil.OonoPuri), help=f"kernel selection ({", ".join(f'{k}: {v}' for k, v in stencils.items())})")
+        laps_parser.add_argument("-t", "--stencil", type=choice, choices=list(stencils.keys()), default=next(k for k, v in stencils.items() if v == NamedStencil.OonoPuri), help=f"kernel selection ({", ".join(f'{k}: {v.description}' for k, v in stencils.items())})")
         laps_parser.add_argument("-c", "--coef", metavar="C", type=ufloat, default=0.2, help="sharpening factor")
         laps_parser.add_argument("-a", "--include-alpha", action="store_true", help="also sharpen the alpha channel")
 

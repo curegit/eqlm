@@ -64,6 +64,21 @@ class NamedStencil(Enum):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def description(self):
+        match self:
+            case NamedStencil.Basic5:
+                return "typical 4-neighbor kernel"
+            case NamedStencil.Basic9:
+                return "typical 8-neighbor kernel"
+            case NamedStencil.Diagonal:
+                return "4-diagonal-neighbor kernel"
+            case NamedStencil.OonoPuri:
+                return "Oono-Puri isotropic kernel, reduced overall error"
+            case NamedStencil.PatraKarttunen:
+                return "Patra-Karttunen isotropic kernel, optimized for rotational invariance"
+        return str(self)
+
 
 modes = {m.name.lower(): m for m in Mode}
 stencils = {s.name.lower(): s for s in NamedStencil}
