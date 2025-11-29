@@ -1,7 +1,7 @@
 from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtCore import QBuffer, QByteArray
 
-app = QGuiApplication()
+app = QGuiApplication.instance() or QGuiApplication()
 
 
 def import_as_png_from_clipboard() -> bytes:
