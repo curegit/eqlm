@@ -1,4 +1,4 @@
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, BooleanOptionalAction
 from .types import fileinput, fileoutput, choice, uint, positive, ufloat, rate, AutoUniquePath
 from .utils import eprint
 from .eq.cli import equalize
@@ -7,6 +7,7 @@ from .match.cli import match
 from .match.core import modes as match_modes
 from .laps.cli import laps
 from .laps.core import NamedStencil, stencils, modes as laps_modes
+from .desc.main import desc
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -63,11 +64,18 @@ def main(argv: list[str] | None = None) -> int:
         laps_parser.add_argument("-c", "--coef", metavar="C", type=ufloat, default=0.2, help="sharpening factor")
         laps_parser.add_argument("-a", "--include-alpha", action="store_true", help="also sharpen the alpha channel")
 
+        # Desc command
+        desc_parser = create_subparser(desc_sub := "desc", description="", help="")
+        desc_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
+        desc_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
+        desc_parser.add_argument("--cmyk", action=BooleanOptionalAction, default=False, help=f"")
+        desc_parser.add_argument("--nl-means", action=BooleanOptionalAction, default=True, help=f"")
+
         # Shared arguments
-        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before the process [GAMMA=2.2]")
+        ParserStack(eq_parser, match_parser, laps_parser, desc_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before the process [GAMMA=2.2]")
         ParserStack(eq_parser, match_parser, laps_parser).add_argument("-d", "--depth", type=int, choices=[8, 16], default=8, help="bit depth of the output PNG image")
-        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
-        ParserStack(eq_parser, match_parser, laps_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
+        ParserStack(eq_parser, match_parser, laps_parser, desc_parser).add_argument("-s", "--slow", action="store_true", help="use the highest PNG compression level")
+        ParserStack(eq_parser, match_parser, laps_parser, desc_parser).add_argument("-x", "--no-orientation", dest="no_orientation", action="store_true", help="ignore the Exif orientation metadata")
 
         args = parser.parse_args(argv)
         match args.command:
@@ -110,6 +118,16 @@ def main(argv: list[str] | None = None) -> int:
                     include_alpha=args.include_alpha,
                     gamma=args.gamma,
                     deep=(args.depth == 16),
+                    slow=args.slow,
+                    orientation=(not args.no_orientation),
+                )
+            case str() as command if command == desc_sub:
+                return desc(
+                    input_file=args.input,
+                    output_file=args.output,
+                    cmyk=args.cmyk,
+                    nl_means=args.nl_means,
+                    gamma=args.gamma,
                     slow=args.slow,
                     orientation=(not args.no_orientation),
                 )
