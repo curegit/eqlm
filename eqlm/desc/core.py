@@ -27,6 +27,36 @@ def ellipse(w, h):
     return o
 
 
+
+def estimate_center_fc_from_thresh(thresh_01: np.ndarray,
+                                  *,
+                                  min_fc=0.1, max_fc=0.5,
+                                  q=50, safety=0.6,
+                                  min_pixels=200) -> float:
+    """
+    thresh_01: 0/1 のピーク候補マスク（中心除外前でもOK）
+    fc: 正規化周波数半径（だいたい 0〜0.5 の範囲のイメージ）
+    """
+    h, w = thresh_01.shape
+    cy, cx = h // 2, w // 2
+    ys, xs = np.nonzero(thresh_01 > 0)
+
+    if len(xs) < min_pixels:
+        return 0.25  # フォールバック（2〜5%が無難）
+
+    fr = np.hypot((xs - cx) / w, (ys - cy) / h)  # 正規化半径
+    fr = fr[fr > min_fc]  # 中心ゴミを無視
+
+    if len(fr) == 0:
+        return 0.03
+
+    r0 = np.percentile(fr, q)     # 第1リング近傍の半径の目安
+    fc = float(np.clip(r0 * safety, min_fc, max_fc))
+    print(fc)
+    return fc
+
+
+
 def fft(channel):
     fftimg = cv2.dft(channel, flags=(cv2.DFT_SCALE + cv2.DFT_COMPLEX_OUTPUT))
     return fftshift(fftimg)
@@ -83,12 +113,6 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
     z = w * 255.0
     channels, height, width = z.shape
 
-    # TODO: parameterize
-    middle_ratio = 1 / 4
-    mid = 1 / middle_ratio * 2
-    ew, eh = int(width / mid), int(height / mid)
-    pw, ph = (width - ew * 2) // 2, (height - eh * 2) // 2
-    middle = np.pad(ellipse(ew, eh), ((ph, height - ph - eh * 2 - 1), (pw, width - pw - ew * 2 - 1)), "constant")
 
     ffts = [fft(channel) for channel in z]
     spectrums = [spectrum_normalized(f) for f in ffts]
@@ -104,6 +128,19 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
         # cv2.getStructuringElement は実装に問題があり使わない
         kernel = ellipse(radius, radius)
         thresh = cv2.dilate(thresh, kernel)
+
+
+
+        # TODO: parameterize
+        middle_ratio = estimate_center_fc_from_thresh(thresh)
+        mid = 1 / middle_ratio * 2
+        ew, eh = int(width / mid), int(height / mid)
+
+        #ew = eh = 1 /  * 2
+        print(middle_ratio)
+        pw, ph = (width - ew * 2) // 2, (height - eh * 2) // 2
+        middle = np.pad(ellipse(ew, eh), ((ph, height - ph - eh * 2 - 1), (pw, width - pw - ew * 2 - 1)), "constant")
+
         # 中心を保護（dilate の侵入も打ち消す）
         thresh *= 1 - middle
         # なだらかにしてリンギングを減らす
