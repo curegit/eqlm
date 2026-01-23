@@ -27,34 +27,24 @@ def ellipse(w, h):
     return o
 
 
-
-def estimate_center_fc_from_thresh(thresh_01: np.ndarray,
-                                  *,
-                                  min_fc=0.1, max_fc=0.5,
-                                  q=50, safety=0.6,
-                                  min_pixels=200) -> float:
-    """
-    thresh_01: 0/1 のピーク候補マスク（中心除外前でもOK）
-    fc: 正規化周波数半径（だいたい 0〜0.5 の範囲のイメージ）
-    """
-    h, w = thresh_01.shape
+def estimate_center_ratio_from_thresh(thresh: ndarray, *, min_r: float = 0.1, max_r: float = 0.5, q: float = 40.0, coef: float = 0.6, min_pixels: int = 200) -> float:
+    h, w = thresh.shape
     cy, cx = h // 2, w // 2
-    ys, xs = np.nonzero(thresh_01 > 0)
+    ys, xs = np.nonzero(thresh > 0)
 
     if len(xs) < min_pixels:
-        return 0.25  # フォールバック（2〜5%が無難）
+        # フォールバック
+        return 0.25
 
-    fr = np.hypot((xs - cx) / w, (ys - cy) / h)  # 正規化半径
-    fr = fr[fr > min_fc]  # 中心ゴミを無視
+    fr = np.hypot((xs - cx) / w, (ys - cy) / h)
+    fr = fr[fr > min_r]  # 中心を無視
 
     if len(fr) == 0:
-        return 0.03
+        return min_r
 
-    r0 = np.percentile(fr, q)     # 第1リング近傍の半径の目安
-    fc = float(np.clip(r0 * safety, min_fc, max_fc))
-    print(fc)
-    return fc
-
+    r0 = np.percentile(fr, q)
+    r = float(np.clip(r0 * coef, min_r, max_r).item())
+    return r
 
 
 def fft(channel):
@@ -122,22 +112,15 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
         thresholds = [threshold] *channels
     for i, (f, s, t) in enumerate(zip(ffts, spectrums, thresholds)):
         _, thresh = cv2.threshold(s, t, 255.0, cv2.THRESH_BINARY)
-        cv2.imwrite(f"test-{i}.png", thresh.astype(np.uint8))
         radius: int = 2
         # ピーク周辺を広げる（安全マージンを確保）
         # cv2.getStructuringElement は実装に問題があり使わない
         kernel = ellipse(radius, radius)
         thresh = cv2.dilate(thresh, kernel)
 
-
-
-        # TODO: parameterize
-        middle_ratio = estimate_center_fc_from_thresh(thresh)
+        middle_ratio = estimate_center_ratio_from_thresh(thresh)
         mid = 1 / middle_ratio * 2
         ew, eh = int(width / mid), int(height / mid)
-
-        #ew = eh = 1 /  * 2
-        print(middle_ratio)
         pw, ph = (width - ew * 2) // 2, (height - eh * 2) // 2
         middle = np.pad(ellipse(ew, eh), ((ph, height - ph - eh * 2 - 1), (pw, width - pw - ew * 2 - 1)), "constant")
 
