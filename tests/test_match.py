@@ -4,18 +4,18 @@ from itertools import product
 from contextlib import redirect_stderr
 from unittest import TestCase
 from eqlm import img as eqimg
-from eqlm.match import core, cli
+from eqlm.match import core, main
 from eqlm.utils import filerelpath
 
 
-class CLITest(TestCase):
+class MainTest(TestCase):
     def test_process(self):
         fpaths = list(map(filerelpath, ["tsurumai.webp", "p3.tiff", "ball.png"]))
         for source_file, reference_file, mode, gamma, alpha in product(fpaths, fpaths, core.Mode, [2.2, None], [(0.0, 0.5), (None, None)]):
             with self.subTest(source_file=source_file, reference_file=reference_file, mode=mode, gamma=gamma):
                 buf = io.BytesIO()
                 with redirect_stderr(io.StringIO()):
-                    cli.match(
+                    main.match(
                         source_file=source_file,
                         reference_file=reference_file,
                         output_file=buf,
@@ -31,7 +31,7 @@ class CLITest(TestCase):
             with self.subTest(mode=mode, slow=slow):
                 buf = io.BytesIO()
                 with redirect_stderr(io.StringIO()):
-                    cli.match(
+                    main.match(
                         source_file=fpath,
                         reference_file=fpath,
                         output_file=buf,

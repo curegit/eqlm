@@ -4,18 +4,18 @@ from itertools import product
 from contextlib import redirect_stderr
 from unittest import TestCase
 from eqlm import img as eqimg
-from eqlm.eq import core, cli
+from eqlm.eq import core, main
 from eqlm.img import color_transforms
 from eqlm.utils import filerelpath
 
 
-class CLITest(TestCase):
+class MainTest(TestCase):
     def test_process(self):
         for mode, vertical, horizontal, interpolation, target, median, clamp, deep in product(core.Mode, [2, 4], [2, 3], core.Interpolation, [0.0, 0.5, 1.0], [True, False], [True, False], [True, False]):
             with self.subTest(mode=mode, vertical=vertical, horizontal=horizontal, interpolation=interpolation, target=target, median=median, clamp=clamp, deep=deep):
                 buf = io.BytesIO()
                 with redirect_stderr(io.StringIO()):
-                    cli.equalize(
+                    main.equalize(
                         input_file=filerelpath("icc.png"),
                         output_file=buf,
                         mode=mode,

@@ -6,7 +6,7 @@ from eqlm import cli
 
 class CLITest(TestCase):
 
-    subcommands = ["eq", "match", "laps"]
+    subcommands = ["eq", "match", "laps", "desc"]
 
     def test_no_args(self):
         with self.assertRaises(SystemExit):
