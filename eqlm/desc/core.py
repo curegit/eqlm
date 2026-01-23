@@ -4,14 +4,16 @@ import numpy as np
 from numpy import ndarray
 from numpy.fft import fftshift, ifftshift
 
-def rgb_2_cmyk(r, g, b, *,k_threshold:float=0.1):
+
+def rgb_2_cmyk(r, g, b, *, k_threshold: float = 0.1):
     k = np.maximum(0, np.minimum(1, (np.minimum(np.minimum(1 - r, 1 - g), 1 - b) - k_threshold) / (1 - k_threshold)))
     a = 1 - k
     cond = a > sys.float_info.epsilon
-    c = np.maximum(0, np.minimum(1,np.divide(1 - r - k, a, out=np.zeros_like(a), where=cond)))
-    m = np.maximum(0, np.minimum(1,np.divide(1 - g - k, a, out=np.zeros_like(a), where=cond)))
-    y = np.maximum(0, np.minimum(1,np.divide(1 - b - k, a, out=np.zeros_like(a), where=cond)))
+    c = np.maximum(0, np.minimum(1, np.divide(1 - r - k, a, out=np.zeros_like(a), where=cond)))
+    m = np.maximum(0, np.minimum(1, np.divide(1 - g - k, a, out=np.zeros_like(a), where=cond)))
+    y = np.maximum(0, np.minimum(1, np.divide(1 - b - k, a, out=np.zeros_like(a), where=cond)))
     return c, m, y, k
+
 
 def cmyk_2_rgb(c, m, y, k):
     r = np.minimum(1, 1 - np.minimum(1, c * (1 - k) + k))
@@ -72,7 +74,7 @@ def spectrum_normalized(fftimg):
     return np.maximum(0, spectrum)
 
 
-def find_threshold(spectrums: list[ndarray], *, cutoff_rate:float=0.05, sync: bool=False):
+def find_threshold(spectrums: list[ndarray], *, cutoff_rate: float = 0.05, sync: bool = False):
     n = len(spectrums)
     thresholds: list[int] = []
     for s in spectrums:
@@ -92,8 +94,8 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
     assert x_channels == 3
 
     if cmyk:
-        r,g,b = x
-        c,m,y,k = rgb_2_cmyk(r,g,b)
+        r, g, b = x
+        c, m, y, k = rgb_2_cmyk(r, g, b)
         x = np.stack((c, m, y, k))
 
     # 外縁部のアーティファクト対策で余白を追加
@@ -103,18 +105,17 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
     z = w * 255.0
     channels, height, width = z.shape
 
-
     ffts = [fft(channel) for channel in z]
     spectrums = [spectrum_normalized(f) for f in ffts]
     if auto_threshold:
         thresholds = find_threshold(spectrums, sync=(not cmyk))
     else:
-        thresholds = [threshold] *channels
+        thresholds = [threshold] * channels
     for i, (f, s, t) in enumerate(zip(ffts, spectrums, thresholds)):
         _, thresh = cv2.threshold(s, t, 255.0, cv2.THRESH_BINARY)
         radius: int = 2
         # ピーク周辺を広げる（安全マージンを確保）
-        # cv2.getStructuringElement は実装に問題があり使わない
+        # cv2.getStructuringElement は現時点で実装に問題があり使わない（縦横で挙動が非対称）
         kernel = ellipse(radius, radius)
         thresh = cv2.dilate(thresh, kernel)
 
@@ -137,9 +138,9 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
     result = dest[:, margin:-margin, margin:-margin]
 
     if cmyk:
-        c,m,y,k = result
-        r,g,b = cmyk_2_rgb(c,m,y,k)
-        result = np.stack((r,g,b))
+        c, m, y, k = result
+        r, g, b = cmyk_2_rgb(c, m, y, k)
+        result = np.stack((r, g, b))
 
     assert (x_channels, x_height, x_width) == tuple(result.shape)
     result = result.clip(0.0, 1.0)
