@@ -71,6 +71,14 @@ Sharpen an image using a Laplacian variant kernel
 <?= shell_exec("python3 -m eqlm laps --help") ?>
 ```
 
+### Desc
+
+Descreen a scanned image using Fourier Transform-based method
+
+```txt
+<?= shell_exec("python3 -m eqlm desc --help") ?>
+```
+
 ## License
 
 GNU Affero General Public License v3.0 or later

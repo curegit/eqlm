@@ -67,18 +67,17 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m {l,brightness,saturation,lightness}, --mode {l,brightness,saturation,lightness}
+  -m, --mode {l,brightness,saturation,lightness}
                         processing mode (l: L (LAB), brightness: Brightness
                         (HSV), saturation: Saturation (HSV), lightness:
                         Lightness (HLS)) (default: l)
-  -n M N, --divide M N  divide image into MxN (Horizontal x Vertical) blocks
+  -n, --divide M N      divide image into MxN (Horizontal x Vertical) blocks
                         for aggregation (default: (2, 2))
-  -i {linear,cubic,akima,makima}, --interpolation {linear,cubic,akima,makima}
+  -i, --interpolation {linear,cubic,akima,makima}
                         interpolation method (linear: Linear, cubic:
                         CubicSpline, akima: AkimaSpline, makima:
                         ModifiedAkimaSpline) (default: linear)
-  -t RATE, --target RATE
-                        set the target rate for the output level, ranging from
+  -t, --target RATE     set the target rate for the output level, ranging from
                         0.0 (minimum) to 1.0 (maximum) (default: Average)
   -c, --clamp           clamp the level values in extrapolated boundaries
                         (default: False)
@@ -86,11 +85,9 @@ options:
                         (default: False)
   -u, --unweighted      disable weighting based on the alpha channel (default:
                         False)
-  -g [GAMMA], --gamma [GAMMA]
-                        apply inverse gamma correction before the process
+  -g, --gamma [GAMMA]   apply inverse gamma correction before the process
                         [GAMMA=2.2] (default: None)
-  -d {8,16}, --depth {8,16}
-                        bit depth of the output PNG image (default: 8)
+  -d, --depth {8,16}    bit depth of the output PNG image (default: 8)
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
@@ -121,22 +118,20 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m {rgb,red,green,blue,lab,ab,l,brightness,saturation,lightness}, --mode {rgb,red,green,blue,lab,ab,l,brightness,saturation,lightness}
+  -m, --mode {rgb,red,green,blue,lab,ab,l,brightness,saturation,lightness}
                         processing mode (rgb: RGB, red: Red (RGB), green:
                         Green (RGB), blue: Blue (RGB), lab: LAB, ab: AB (LAB),
                         l: L (LAB), brightness: Brightness (HSV), saturation:
                         Saturation (HSV), lightness: Lightness (HLS))
                         (default: rgb)
-  -a SOURCE REFERENCE, --alpha SOURCE REFERENCE
+  -a, --alpha SOURCE REFERENCE
                         cutout threshold for the alpha channel (source,
                         reference) (default: (0.0, 0.5))
   -u, --unweighted      disable cutout based on the alpha channel (default:
                         False)
-  -g [GAMMA], --gamma [GAMMA]
-                        apply inverse gamma correction before the process
+  -g, --gamma [GAMMA]   apply inverse gamma correction before the process
                         [GAMMA=2.2] (default: None)
-  -d {8,16}, --depth {8,16}
-                        bit depth of the output PNG image (default: 8)
+  -d, --depth {8,16}    bit depth of the output PNG image (default: 8)
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
@@ -164,21 +159,56 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m {rgb,red,green,blue,lab,ab,l}, --mode {rgb,red,green,blue,lab,ab,l}
+  -m, --mode {rgb,red,green,blue,lab,ab,l}
                         processing channel mode (rgb: RGB, red: Red (RGB),
                         green: Green (RGB), blue: Blue (RGB), lab: LAB, ab: AB
                         (LAB), l: L (LAB)) (default: rgb)
-  -t {basic5,basic9,diagonal,oonopuri,patrakarttunen}, --stencil {basic5,basic9,diagonal,oonopuri,patrakarttunen}
-                        kernel selection (basic5: Basic5, basic9: Basic9,
-                        diagonal: Diagonal, oonopuri: OonoPuri,
-                        patrakarttunen: PatraKarttunen) (default: oonopuri)
-  -c C, --coef C        sharpening factor (default: 0.2)
+  -t, --stencil {basic5,basic9,diagonal,oonopuri,patrakarttunen}
+                        kernel selection (basic5: typical 4-neighbor kernel,
+                        basic9: typical 8-neighbor kernel, diagonal:
+                        4-diagonal-neighbor kernel, oonopuri: Oono-Puri
+                        isotropic kernel, reduced overall error,
+                        patrakarttunen: Patra-Karttunen isotropic kernel,
+                        optimized for rotational invariance) (default:
+                        oonopuri)
+  -c, --coef C          sharpening factor (default: 0.2)
   -a, --include-alpha   also sharpen the alpha channel (default: False)
-  -g [GAMMA], --gamma [GAMMA]
-                        apply inverse gamma correction before the process
+  -g, --gamma [GAMMA]   apply inverse gamma correction before the process
                         [GAMMA=2.2] (default: None)
-  -d {8,16}, --depth {8,16}
-                        bit depth of the output PNG image (default: 8)
+  -d, --depth {8,16}    bit depth of the output PNG image (default: 8)
+  -s, --slow            use the highest PNG compression level (default: False)
+  -x, --no-orientation  ignore the Exif orientation metadata (default: False)
+
+A '--' is usable to terminate option parsing so remaining arguments are
+treated as positional arguments.
+```
+
+### Desc
+
+Descreen a scanned image using Fourier Transform-based method
+
+```txt
+usage: eqlm desc [-h] [--cmyk | --no-cmyk] [--nl-means | --no-nl-means]
+                 [-g [GAMMA]] [-s] [-x]
+                 IN_FILE [OUT_FILE]
+
+Fourier Transform-based descreening for scanned images
+
+positional arguments:
+  IN_FILE               input image file path (use '-' for stdin, '_' for
+                        clipboard)
+  OUT_FILE              output PNG image file path (use '-' for stdout, '_'
+                        for clipboard) (default: AutoUnique)
+
+options:
+  -h, --help            show this help message and exit
+  --cmyk, --no-cmyk     switch to perform descreening in CMYK color space
+                        (default: False)
+  --nl-means, --no-nl-means
+                        switch to apply Non-Local Means denoising after
+                        descreening (default: True)
+  -g, --gamma [GAMMA]   apply inverse gamma correction before the process
+                        [GAMMA=2.2] (default: None)
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
