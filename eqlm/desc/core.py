@@ -115,7 +115,7 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
         _, thresh = cv2.threshold(s, t, 255.0, cv2.THRESH_BINARY)
         radius: int = 2
         # ピーク周辺を広げる（安全マージンを確保）
-        # cv2.getStructuringElement は現時点で実装に問題があり使わない（縦横で挙動が非対称）
+        # cv2.getStructuringElement は現時点では実装に問題があり使わない（縦横で挙動が非対称）
         kernel = ellipse(radius, radius)
         thresh = cv2.dilate(thresh, kernel)
 
