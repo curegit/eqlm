@@ -1,4 +1,4 @@
-.PHONY: build install devinstall preview publish clean format check test testcov
+.PHONY: build install install-clipboard devinstall preview publish clean format check test testcov
 
 build: clean
 	php README.md.php > README.md
@@ -7,8 +7,11 @@ build: clean
 install:
 	python3 -m pip install .
 
+install-clipboard:
+	python3 -m pip install .[clipboard]
+
 devinstall:
-	python3 -m pip install -e .[dev]
+	python3 -m pip install -e .[dev,clipboard]
 
 preview: build
 	python3 -m twine upload -u __token__ --repository-url "https://test.pypi.org/legacy/" dist/*
