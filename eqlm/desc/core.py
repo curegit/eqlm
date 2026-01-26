@@ -99,7 +99,7 @@ def descreen(x: ndarray, *, auto_threshold: bool = True, threshold: float = 85.0
         x = np.stack((c, m, y, k))
 
     # 外縁部のアーティファクト対策で余白を追加
-    margin: int = 5
+    margin: int = 12
     w = np.pad(x, ((0, 0), (margin, margin), (margin, margin)), mode="reflect")
     dest = np.zeros_like(w)
     z = w * 255.0
