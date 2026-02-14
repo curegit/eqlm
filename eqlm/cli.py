@@ -68,8 +68,8 @@ def main(argv: list[str] | None = None) -> int:
         desc_parser = create_subparser(desc_sub := "desc", description="Fourier Transform-based descreening for scanned images", help="Fourier Transform-based descreening for scanned images")
         desc_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         desc_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
-        desc_parser.add_argument("--cmyk", action=BooleanOptionalAction, default=False, help=f"switch to perform descreening in CMYK color space")
-        desc_parser.add_argument("--nl-means", action=BooleanOptionalAction, default=True, help=f"switch to apply Non-Local Means denoising after descreening")
+        desc_parser.add_argument("--cmyk", action=BooleanOptionalAction, default=False, help="switch to perform descreening in CMYK color space")
+        desc_parser.add_argument("--nl-means", action=BooleanOptionalAction, default=True, help="switch to apply Non-Local Means denoising after descreening")
 
         # Shared arguments
         ParserStack(eq_parser, match_parser, laps_parser, desc_parser).add_argument("-g", "--gamma", metavar="GAMMA", type=positive, nargs="?", const=2.2, help="apply inverse gamma correction before the process [GAMMA=2.2]")
