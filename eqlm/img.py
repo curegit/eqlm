@@ -3,6 +3,7 @@ import struct
 import zlib
 import cv2
 import numpy as np
+from collections.abc import Callable
 from enum import Enum
 from pathlib import Path
 from io import BufferedIOBase
@@ -27,6 +28,7 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
         icc = None
     # OpenCV が ASCII パスしか扱えない問題を回避するためにバッファを経由する
     bin = np.frombuffer(buffer, np.uint8)
+    img: ndarray
     if orientation:
         img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_IGNORE_ORIENTATION ^ cv2.IMREAD_COLOR_RGB)
     else:
@@ -120,7 +122,7 @@ class Color(Enum):
     RGB = cv2.COLOR_BGR2RGB, cv2.COLOR_RGB2BGR
 
 
-def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool = False):
+def color_transforms(color: Color, *, gamma: float | None = 2.2, transpose: bool = False) -> tuple[Callable[[ndarray], ndarray], Callable[[ndarray], ndarray]]:
     f, r = color.value
 
     def g(x: ndarray) -> ndarray:

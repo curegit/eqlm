@@ -22,7 +22,7 @@ def import_as_png_from_clipboard() -> bytes:
     return bytes(bits.data())
 
 
-def save_to_clipboard(png_bytes: bytes):
+def save_to_clipboard(png_bytes: bytes) -> None:
     clipboard = QGuiApplication.clipboard()
     # QImage::Format_RGB32 / QImage::Format_ARGB32 (this preserves ICC profiles)
     image = QImage.fromData(png_bytes)
