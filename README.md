@@ -42,6 +42,18 @@ Note that the clipboard functionality depends heavily on the OS you are using.
 | --------------------------------- | --------------------------------------- |
 | ![Input Image](images/hakone.jpg) | ![Output Image](images/hakone-eqlm.jpg) |
 
+### `$ eqlm laps images/mayuno-eqlm.jpg -c 0.3`
+
+| Source                                 | Result                                  |
+| -------------------------------------- | --------------------------------------- |
+| ![Input Image](images/mayuno-eqlm.jpg) | ![Output Image](images/mayuno-laps.jpg) |
+
+### `$ eqlm desc images/halftone.png`
+
+| Source                              | Result                                    |
+| ----------------------------------- | ----------------------------------------- |
+| ![Input Image](images/halftone.png) | ![Output Image](images/halftone-desc.png) |
+
 ## Commands
 
 The main program can be invoked either through the `eqlm` command or through the Python main module option `python3 -m eqlm`.
