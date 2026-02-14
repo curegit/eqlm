@@ -26,7 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 clipboard = ["pyside6"]
-dev = ["pip", "build", "twine", "black", "mypy", "coverage", "scipy-stubs"]
+dev = ["pip", "build", "twine", "black", "pyright[nodejs]", "coverage", "scipy-stubs"]
 
 [project.scripts]
 eqlm = "eqlm.cli:main"
