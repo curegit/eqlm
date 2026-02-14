@@ -31,7 +31,7 @@ def main(argv: list[str] | None = None) -> int:
         subparsers = parser.add_subparsers(dest="command", required=True, help="command to perform")
 
         def create_subparser(cmd: str, **kwargs):
-            return subparsers.add_parser(cmd, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, epilog="A '--' is usable to terminate option parsing so remaining arguments are treated as positional arguments.", **kwargs)
+            return subparsers.add_parser(cmd, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, epilog="'--' can be used to terminate option parsing, so that remaining arguments are treated as positional arguments.", **kwargs)
 
         # Original eq command
         eq_parser = create_subparser(eq_sub := "eq", aliases=["equalize"], description="Equalize image lightness, saturation, or brightness", help="equalize image lightness, saturation, or brightness")

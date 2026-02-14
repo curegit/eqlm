@@ -14,7 +14,7 @@ pip install eqlm
 pip install eqlm[clipboard]
 ```
 
-Note that the clipboard functionality depends heavily on the OS you are using.
+Note that clipboard support varies depending on your OS.
 
 ## Examples
 
@@ -103,7 +103,7 @@ options:
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
-A '--' is usable to terminate option parsing so remaining arguments are
+'--' can be used to terminate option parsing, so that remaining arguments are
 treated as positional arguments.
 ```
 
@@ -147,7 +147,7 @@ options:
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
-A '--' is usable to terminate option parsing so remaining arguments are
+'--' can be used to terminate option parsing, so that remaining arguments are
 treated as positional arguments.
 ```
 
@@ -191,13 +191,13 @@ options:
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
-A '--' is usable to terminate option parsing so remaining arguments are
+'--' can be used to terminate option parsing, so that remaining arguments are
 treated as positional arguments.
 ```
 
 ### Desc
 
-Descreen a scanned image using Fourier Transform-based method
+Descreen a scanned image using a Fourier Transform-based method
 
 ```txt
 usage: eqlm desc [-h] [--cmyk | --no-cmyk] [--nl-means | --no-nl-means]
@@ -224,7 +224,7 @@ options:
   -s, --slow            use the highest PNG compression level (default: False)
   -x, --no-orientation  ignore the Exif orientation metadata (default: False)
 
-A '--' is usable to terminate option parsing so remaining arguments are
+'--' can be used to terminate option parsing, so that remaining arguments are
 treated as positional arguments.
 ```
 

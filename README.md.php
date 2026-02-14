@@ -14,7 +14,7 @@ pip install eqlm
 pip install eqlm[clipboard]
 ```
 
-Note that the clipboard functionality depends heavily on the OS you are using.
+Note that clipboard support varies depending on your OS.
 
 ## Examples
 
@@ -85,7 +85,7 @@ Sharpen an image using a Laplacian variant kernel
 
 ### Desc
 
-Descreen a scanned image using Fourier Transform-based method
+Descreen a scanned image using a Fourier Transform-based method
 
 ```txt
 <?= shell_exec("python3 -m eqlm desc --help") ?>
