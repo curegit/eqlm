@@ -80,6 +80,9 @@ def find_threshold(spectrums: list[ndarray], *, cutoff_rate: float = 0.05, sync:
     for s in spectrums:
         hist = np.bincount(s.ravel().astype(np.uint8))
         hist_alt = hist[1:]
+        if not len(hist_alt):
+            thresholds.append(1)
+            continue
         peak = hist_alt.argmax()
         peak_count = hist_alt[peak]
         window_size = 3
