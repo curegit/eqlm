@@ -86,7 +86,11 @@ def find_threshold(spectrums: list[ndarray], *, cutoff_rate: float = 0.05, sync:
         peak = hist_alt.argmax()
         peak_count = hist_alt[peak]
         window_size = 3
-        cut_index = int((sum(hist_alt[peak + i + 1 : -window_size + i] for i in range(window_size)) / window_size < peak_count * cutoff_rate).argmax().item() + peak + 1)
+        effective = sum(hist_alt[peak + i + 1 : -window_size + i] for i in range(window_size)) / window_size < peak_count * cutoff_rate
+        if len(effective) < window_size:
+            thresholds.append(int(peak.item()))
+            continue
+        cut_index = int(effective.argmax().item() + peak + 1)
         thresholds.append(cut_index + 1)
     threshold = sum(thresholds) / n
     return [threshold] * n if sync else [float(t) for t in thresholds]
