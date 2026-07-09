@@ -114,6 +114,7 @@ def embed_icc_png(png_bytes: bytes, icc_profile: bytes) -> bytes:
     iccp_length = struct.pack("!I", len(iccp_chunk_data))
     iccp_crc = struct.pack("!I", zlib.crc32(iccp_chunk_type + iccp_chunk_data, 0))
     iccp_chunk = iccp_length + iccp_chunk_type + iccp_chunk_data + iccp_crc
+    # OpenCV が IHDR と IDAT の間に別チャンクを入れ始めると壊れる
     return png_bytes[:33] + iccp_chunk + png_bytes[33:]
 
 
