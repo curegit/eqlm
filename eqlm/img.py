@@ -33,7 +33,9 @@ def load_image(filelike: str | Path | bytes | memoryview, *, normalize: bool = T
         img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_IGNORE_ORIENTATION ^ cv2.IMREAD_COLOR_RGB)
     else:
         img = cv2.imdecode(bin, cv2.IMREAD_UNCHANGED ^ cv2.IMREAD_COLOR_RGB)
-    if img.shape[2] not in [3, 4]:
+    if img is None:
+        raise RuntimeError("Image decoding failed")
+    if img.ndim != 3 or img.shape[2] not in [3, 4]:
         raise TypeError("Only RGB[A] color images supported")
     match img.dtype:
         case np.uint8:
