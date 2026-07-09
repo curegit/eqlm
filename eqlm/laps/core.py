@@ -97,8 +97,9 @@ def laplacian_sharpening(x: ndarray, stencil: NinePointStencil, channels: list[i
     result[:, :, channels] = cv2.filter2D(h := x[:, :, channels], -1, kernel, borderType=cv2.BORDER_REFLECT).reshape(h.shape)
     if clip is not None:
         if isinstance(clip, tuple):
-            result = result.clip(*clip)
+            for i in channels:
+                result[:, :, i] = result[:, :, i].clip(*clip)
         else:
-            for i, bound in zip(range(result.shape[2]), clip):
+            for i, bound in zip(channels, clip):
                 result[:, :, i] = result[:, :, i].clip(*bound)
     return result
