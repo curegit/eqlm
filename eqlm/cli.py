@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
             return subparsers.add_parser(cmd, allow_abbrev=False, formatter_class=ArgumentDefaultsHelpFormatter, epilog="'--' can be used to terminate option parsing, so that remaining arguments are treated as positional arguments.", **kwargs)
 
         # Original eq command
-        eq_parser = create_subparser(eq_sub := "eq", aliases=["equalize"], description="Equalize image lightness, saturation, or brightness", help="equalize image lightness, saturation, or brightness")
+        eq_parser = create_subparser(eq_sub := "eq", aliases=[eq_sub_alias := "equalize"], description="Equalize image lightness, saturation, or brightness", help="equalize image lightness, saturation, or brightness")
         eq_parser.add_argument("input", metavar="IN_FILE", type=fileinput, help="input image file path (use '-' for stdin, '_' for clipboard)")
         eq_parser.add_argument("output", metavar="OUT_FILE", type=fileoutput, nargs="?", default=AutoUniquePath(), help="output PNG image file path (use '-' for stdout, '_' for clipboard)")
         eq_parser.add_argument("-m", "--mode", type=choice, choices=list(eq_modes.keys()), default=list(eq_modes.keys())[0], help=f"processing mode ({", ".join(f'{k}: {v}' for k, v in eq_modes.items())})")
@@ -79,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
 
         args = parser.parse_args(argv)
         match args.command:
-            case str() as command if command == eq_sub:
+            case str() as command if command == eq_sub or command == eq_sub_alias:
                 return equalize(
                     input_file=args.input,
                     output_file=args.output,
