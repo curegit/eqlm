@@ -3,11 +3,11 @@ from pathlib import Path
 from .core import Mode, histogram_matching
 from ..img import split_alpha, merge_alpha, color_transforms
 from ..io import import_image, export_png
-from ..types import AutoUniquePath
+from ..types import Clipboard, AutoUniquePath
 from ..utils import eprint
 
 
-def match(*, source_file: Path | str | bytes | None, reference_file: Path | str | bytes | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
+def match(*, source_file: Path | str | bytes | Clipboard | None, reference_file: Path | str | bytes | Clipboard | None, output_file: Path | str | AutoUniquePath | BufferedIOBase | Clipboard | None, mode: Mode, alpha: tuple[float | None, float | None] = (0.0, 0.5), gamma: float | None = None, deep: bool = False, slow: bool = False, orientation: bool = True) -> int:
     exit_code = 0
 
     if source_file is None and reference_file is None:
@@ -31,7 +31,7 @@ def match(*, source_file: Path | str | bytes | None, reference_file: Path | str 
     eprint("Saving ...")
 
     if isinstance(output_file, AutoUniquePath):
-        output_file.input_path = "stdin" if source_file is None else "memory" if isinstance(source_file, bytes) else source_file
+        output_file.input_path = "stdin" if source_file is None else "clipboard" if isinstance(source_file, Clipboard) else "memory" if isinstance(source_file, bytes) else source_file
         output_file.suffix = f"-matched-{mode.name.lower()}"
     if (return_code := export_png(y, output_file, deep=deep, slow=slow, icc=ref_icc)) != 0:
         exit_code = return_code
