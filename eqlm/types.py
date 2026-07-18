@@ -107,7 +107,7 @@ class AutoUniquePath:
         if suffix is None:
             suffix = self.suffix
         path = Path(input_path).resolve(strict=False)
-        filepath = (Path(".") / (path.stem + suffix)).with_suffix(f"{os.extsep}{ext}" if ext else "")
+        filepath = (Path(".") / (path.stem + suffix + (f"{os.extsep}{ext}" if ext else "")))
         while True:
             try:
                 return open(filepath, "xb"), filepath
