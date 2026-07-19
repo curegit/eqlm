@@ -56,7 +56,7 @@ def fft(channel):
 
 def ifft(fftimg):
     img_back = cv2.idft(ifftshift(fftimg))
-    return cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+    return img_back[:, :, 0]
 
 
 def spectrum_normalized(fftimg):
