@@ -70,7 +70,7 @@ def spectrum_normalized(fftimg):
 
     height, width, _ = fftimg.shape
     coefs = normalization(height, width)
-    spectrum = 20 * np.log(cv2.magnitude(fftimg[:, :, 0], fftimg[:, :, 1]) * coefs)
+    spectrum = 20 * np.log(cv2.magnitude(fftimg[:, :, 0], fftimg[:, :, 1]) * coefs + 1e-8)
     return np.maximum(0, spectrum)
 
 
