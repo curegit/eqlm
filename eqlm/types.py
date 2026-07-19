@@ -58,6 +58,8 @@ def fileinput(string: str):
     path = Path(nonempty(string)).resolve(strict=True)
     if path.is_file():
         return path
+    elif path.is_dir():
+        raise IsADirectoryError(f"Path is a directory: {path}")
     else:
         raise FileNotFoundError(f"No such file: {path}")
 
@@ -74,12 +76,12 @@ def fileoutput(string: str):
         if path.is_file():
             return path
         else:
-            raise RuntimeError(f"Path already exists: {path}")
+            raise FileExistsError(f"Path already exists: {path}")
     else:
         if path.parent.is_dir():
             return path
         else:
-            raise RuntimeError(f"Destination directory doesn't exist: {path.parent}")
+            raise FileNotFoundError(f"Destination directory doesn't exist: {path.parent}")
 
 
 def choice(label: str):
