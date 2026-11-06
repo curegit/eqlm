@@ -1,5 +1,7 @@
 # Eqlm
 
+[![Unit Tests](https://github.com/curegit/eqlm/actions/workflows/test.yml/badge.svg)](https://github.com/curegit/eqlm/actions/workflows/test.yml)
+
 A CLI tool to manipulate images in various ways
 
 ## Installation
