@@ -1,4 +1,4 @@
-.PHONY: build install install-clipboard devinstall preview publish clean format check test testcov
+.PHONY: build install install-clipboard devinstall devinstall-clipboard preview publish clean format check test testcov
 
 build: clean
 	php README.md.php > README.md
@@ -11,6 +11,9 @@ install-clipboard:
 	python3 -m pip install .[clipboard]
 
 devinstall:
+	python3 -m pip install -e .[dev]
+
+devinstall-clipboard:
 	python3 -m pip install -e .[dev,clipboard]
 
 preview: build
